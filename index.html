@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 
     <style>
         body {
@@ -151,7 +152,7 @@
 
         <div class="pt-4 border-t border-slate-800/80 space-y-3">
             <button id="btn_generate_share" onclick="generateAndCopyUserLink()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2.5 text-sm tracking-wide shadow-lg shadow-blue-500/10">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/xl" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                 Generate & Salin Link User (WhatsApp)
             </button>
 
@@ -279,15 +280,11 @@
             document.getElementById('out_label_tgl').innerText = this.value;
         });
 
-        // FUNGSI CLEAR YANG SUDAH DIPERBAIKI TOTAL & DIJAMIN VALID
         function clearSignature(canvasId, imgRenderId) {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
             const imgRender = document.getElementById(imgRenderId);
-            
-            // Hapus coretan di kanvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // Kosongkan source gambar di dokumen preview & sembunyikan kembali
             imgRender.src = '';
             imgRender.classList.add('hidden');
         }
@@ -335,7 +332,8 @@
             }
 
             function sync() {
-                imgRender.src = canvas.toDataURL('image/png');
+                // Gunakan kompresi canvas kualitas sedang agar ukuran data URL gambar TTD jauh lebih kecil
+                imgRender.src = canvas.toDataURL('image/jpeg', 0.5);
                 imgRender.classList.remove('hidden');
             }
 
@@ -347,6 +345,7 @@
             canvas.addEventListener('touchend', () => isDrawing = false);
         }
 
+        // ENGINE GENERATE LINK BARU: DENGAN SISTEM PAKO GZIP COMPRESSION
         function generateAndCopyUserLink() {
             const payload = {
                 nama: document.getElementById('out_nama').value,
@@ -357,68 +356,101 @@
                 evaluasi: document.getElementById('box_evaluasi').value,
                 penyebab: document.getElementById('box_penyebab').value,
                 commitment: document.getElementById('box_commitment').value,
-                ttdAtasan: document.getElementById('img_render_atasan').src
+                ttdAtasan: document.getElementById('img_render_atasan').classList.contains('hidden') ? "" : document.getElementById('img_render_atasan').src
             };
 
-            const jsonString = JSON.stringify(payload);
-            const encodedData = btoa(encodeURIComponent(jsonString));
+            try {
+                const jsonString = JSON.stringify(payload);
+                // Proses Kompresi Gzip String menggunakan Pako
+                const compressedUint8Array = pako.deflate(jsonString, { to: 'string' });
+                // Ubah menjadi Base64 yang aman untuk URL internet
+                const base64Encoded = btoa(String.fromCharCode.apply(null, compressedUint8Array))
+                                        .replace(/\+/g, '-')
+                                        .replace(/\//g, '_')
+                                        .replace(/=+$/, '');
 
-            const baseUrl = window.location.href.split('?')[0];
-            const shareableUrl = `${baseUrl}?mode=user&data=${encodedData}`;
+                const baseUrl = window.location.href.split('?')[0];
+                const shareableUrl = `${baseUrl}?v=2&data=${base64Encoded}`;
 
-            navigator.clipboard.writeText(shareableUrl).then(() => {
-                alert("✓ BERHASIL! Link Khusus User telah disalin ke clipboard.\n\nSilakan langsung kirim (paste) tautan tersebut ke WhatsApp Kurir/User yang bersangkutan.");
-            }).catch(err => {
-                console.error("Gagal menyalin link: ", err);
-                prompt("Salin link user secara manual di bawah ini:", shareableUrl);
-            });
+                navigator.clipboard.writeText(shareableUrl).then(() => {
+                    alert("✓ BERHASIL DISESUAIKAN!\nLink Khusus User sekarang jauh lebih PENDEK & RESMI.\n\nSilakan langsung paste (kirim) ke WhatsApp Kurir.");
+                }).catch(err => {
+                    prompt("Salin link user di bawah ini:", shareableUrl);
+                });
+            } catch (error) {
+                console.error(error);
+                alert("Gagal mengompresi data link!");
+            }
         }
 
+        // ENGINE DECODE DATA URL YANG MENERIMA FORMAT LAMA DAN FORMAT BARU (KOMPRESI)
         function checkUrlParameters() {
             const urlParams = new URLSearchParams(window.location.search);
-            const mode = urlParams.get('mode');
-            const encodedData = urlParams.get('data');
+            const dataVersion = urlParams.get('v'); 
+            const mode = urlParams.get('mode'); 
+            let encodedData = urlParams.get('data');
 
-            if (mode === 'user' && encodedData) {
+            if (encodedData) {
                 try {
-                    const decodedString = decodeURIComponent(atob(encodedData));
-                    const data = JSON.parse(decodedString);
+                    let jsonString = "";
 
-                    document.getElementById('out_nama').value = data.nama;
-                    document.getElementById('out_nik').value = data.nik;
-                    document.getElementById('out_jabatan').value = data.jabatan;
-                    document.getElementById('out_tanggal').value = data.tanggal;
-                    document.getElementById('out_pertemuan').value = data.pertemuan;
-                    document.getElementById('box_evaluasi').value = data.evaluasi;
-                    document.getElementById('box_penyebab').value = data.penyebab;
-                    document.getElementById('box_commitment').value = data.commitment;
-
-                    if (data.ttdAtasan && data.ttdAtasan !== window.location.href) {
-                        const imgAtasan = document.getElementById('img_render_atasan');
-                        imgAtasan.src = data.ttdAtasan;
-                        imgAtasan.classList.remove('hidden');
+                    if (dataVersion === '2') {
+                        // Handle format baru (Kompresi Gzip - Pendek & Stabil untuk WA)
+                        encodedData = encodedData.replace(/-/g, '+').replace(/_/g, '/');
+                        while (encodedData.length % 4) { encodedData += '='; }
+                        
+                        const binaryString = atob(encodedData);
+                        const len = binaryString.length;
+                        const bytes = new Uint8Array(len);
+                        for (let i = 0; i < len; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);
+                        }
+                        jsonString = pako.inflate(bytes, { to: 'string' });
+                    } else if (mode === 'user') {
+                        // Jalur pemulihan cadangan jika menggunakan link versi lama
+                        jsonString = decodeURIComponent(atob(encodedData));
                     }
 
-                    document.getElementById('out_ttd_nama').innerText = data.nama.toUpperCase();
-                    document.getElementById('out_ttd_nik').innerText = data.nik;
-                    document.getElementById('out_label_tgl').innerText = data.tanggal;
+                    if (jsonString) {
+                        const data = JSON.parse(jsonString);
 
-                    document.getElementById('workspace_root').classList.add('user-mode-active');
-                    
-                    document.getElementById('badge_mode').innerText = "Mode: User (Readonly)";
-                    document.getElementById('badge_mode').className = "px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20 uppercase tracking-wider";
-                    document.getElementById('guide_title').innerText = "Portal Verifikasi & E-Sign Kurir";
-                    document.getElementById('guide_title').className = "flex items-center gap-2 text-green-400 font-semibold uppercase tracking-wider mb-1.5";
-                    document.getElementById('guide_desc').innerText = "Silakan baca hasil evaluasi dan komitmen kerja Anda di lembar kanan. Konten berkas telah dikunci dan tidak bisa diubah. Berikan tanda tangan Anda pada pad di bawah ini, lalu download file resmi PDF sebagai bukti.";
-                    
-                    document.getElementById('pad_atasan_container').classList.add('hidden');
-                    document.getElementById('btn_generate_share').classList.add('hidden');
+                        document.getElementById('out_nama').value = data.nama;
+                        document.getElementById('out_nik').value = data.nik;
+                        document.getElementById('out_jabatan').value = data.jabatan;
+                        document.getElementById('out_tanggal').value = data.tanggal;
+                        document.getElementById('out_pertemuan').value = data.pertemuan;
+                        document.getElementById('box_evaluasi').value = data.evaluasi;
+                        document.getElementById('box_penyebab').value = data.penyebab;
+                        document.getElementById('box_commitment').value = data.commitment;
+
+                        if (data.ttdAtasan && data.ttdAtasan !== window.location.href) {
+                            const imgAtasan = document.getElementById('img_render_atasan');
+                            imgAtasan.src = data.ttdAtasan;
+                            imgAtasan.classList.remove('hidden');
+                        }
+
+                        document.getElementById('out_ttd_nama').innerText = data.nama.toUpperCase();
+                        document.getElementById('out_ttd_nik').innerText = data.nik;
+                        document.getElementById('out_label_tgl').innerText = data.tanggal;
+
+                        // Aktifkan Tampilan Terkunci Khusus User Kurir
+                        document.getElementById('workspace_root').classList.add('user-mode-active');
+                        document.getElementById('badge_mode').innerText = "Mode: User (Readonly)";
+                        document.getElementById('badge_mode').className = "px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20 uppercase tracking-wider";
+                        document.getElementById('guide_title').innerText = "Portal Verifikasi & E-Sign Kurir";
+                        document.getElementById('guide_title').className = "flex items-center gap-2 text-green-400 font-semibold uppercase tracking-wider mb-1.5";
+                        document.getElementById('guide_desc').innerText = "Silakan baca hasil evaluasi dan komitmen kerja Anda di lembar kanan. Konten berkas telah dikunci dan tidak bisa diubah. Berikan tanda tangan Anda pada pad di bawah ini, lalu download file resmi PDF sebagai bukti.";
+                        
+                        document.getElementById('pad_atasan_container').classList.add('hidden');
+                        document.getElementById('btn_generate_share').classList.add('hidden');
+                    }
 
                 } catch (e) {
-                    console.error("Gagal melakukan parsing data URL: ", e);
-                    alert("Waduh, data link rusak atau tidak valid!");
+                    console.error("Parsing Error: ", e);
+                    alert("Waduh, data link rusak atau kepotong saat dikirim lewat WA!");
                 }
             } else {
+                // Teks bawaan awal cetakan form
                 document.getElementById('box_evaluasi').value = "- Melakukan pelanggaran berupa penyetoran uang COD tidak pada hari yang sama. Sesuai ketentuan, seluruh uang COD wajib disetorkan maksimal pukul 23.59 pada setiap harinya, namun dilakukan penyetoran pada hari berikutnya.";
                 document.getElementById('box_penyebab').value = "- Keterlambatan penyetoran terjadi karena kurangnya kedisiplinan dan ketelitian dalam mematuhi prosedur operasional terkait batas waktu setor COD yang telah ditetapkan perusahaan.";
                 document.getElementById('box_commitment').value = "# Yang bersangkutan menyatakan memahami kesalahan yang telah dilakukan dan berkomitmen untuk:\nBerkomitmen untuk melakukan penyetoran uang COD tepat waktu setiap hari sebelum batas maksimal pukul 23.59, mematuhi seluruh SOP yang berlaku, serta tidak mengulangi pelanggaran yang sama di kemudian hari.";
