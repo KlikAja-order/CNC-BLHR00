@@ -132,20 +132,20 @@
             </div>
 
             <div class="space-y-4">
-                <div id="pad_atasan_container" class="bg-slate-950/60 p-4 border border-slate-800/80 rounded-xl">
-                    <div class="flex justify-between items-center mb-2">
+                <div id="pad_atasan_container" class="bg-slate-950/60 p-4 border border-slate-800/80 rounded-xl flex flex-col items-center">
+                    <div class="flex justify-between items-center mb-2 w-full">
                         <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Tanda Tangan Atasan</span>
                         <button type="button" onclick="clearSignature('canvas_atasan', 'img_render_atasan')" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-0.5 rounded transition-colors">Clear</button>
                     </div>
-                    <canvas id="canvas_atasan" class="w-full h-60 bg-white rounded-lg border border-slate-700 touch-none" width="360" height="240"></canvas>
+                    <canvas id="canvas_atasan" class="w-[250px] h-[250px] bg-white rounded-lg border border-slate-700 touch-none" width="250" height="250"></canvas>
                 </div>
 
-                <div id="pad_karyawan_container" class="bg-slate-950/60 p-4 border border-slate-800/80 rounded-xl">
-                    <div class="flex justify-between items-center mb-2">
+                <div id="pad_karyawan_container" class="bg-slate-950/60 p-4 border border-slate-800/80 rounded-xl flex flex-col items-center">
+                    <div class="flex justify-between items-center mb-2 w-full">
                         <span class="text-xs font-semibold text-orange-400 uppercase tracking-wider">Tanda Tangan Karyawan / Satria</span>
                         <button type="button" onclick="clearSignature('canvas_karyawan', 'img_render_karyawan')" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-0.5 rounded transition-colors">Clear</button>
                     </div>
-                    <canvas id="canvas_karyawan" class="w-full h-60 bg-white rounded-lg border border-slate-700 touch-none" width="360" height="240"></canvas>
+                    <canvas id="canvas_karyawan" class="w-[250px] h-[250px] bg-white rounded-lg border border-slate-700 touch-none" width="250" height="250"></canvas>
                 </div>
             </div>
         </div>
@@ -332,8 +332,8 @@
             }
 
             function sync() {
-                // Gunakan kompresi canvas kualitas sedang agar ukuran data URL gambar TTD jauh lebih kecil
-                imgRender.src = canvas.toDataURL('image/jpeg', 0.5);
+                // DIPERBAIKI: Menggunakan image/png agar transparansi terjaga dan TIDAK muncul blok hitam
+                imgRender.src = canvas.toDataURL('image/png');
                 imgRender.classList.remove('hidden');
             }
 
@@ -345,7 +345,6 @@
             canvas.addEventListener('touchend', () => isDrawing = false);
         }
 
-        // ENGINE GENERATE LINK BARU: DENGAN SISTEM PAKO GZIP COMPRESSION
         function generateAndCopyUserLink() {
             const payload = {
                 nama: document.getElementById('out_nama').value,
@@ -361,9 +360,7 @@
 
             try {
                 const jsonString = JSON.stringify(payload);
-                // Proses Kompresi Gzip String menggunakan Pako
                 const compressedUint8Array = pako.deflate(jsonString, { to: 'string' });
-                // Ubah menjadi Base64 yang aman untuk URL internet
                 const base64Encoded = btoa(String.fromCharCode.apply(null, compressedUint8Array))
                                         .replace(/\+/g, '-')
                                         .replace(/\//g, '_')
@@ -383,7 +380,6 @@
             }
         }
 
-        // ENGINE DECODE DATA URL YANG MENERIMA FORMAT LAMA DAN FORMAT BARU (KOMPRESI)
         function checkUrlParameters() {
             const urlParams = new URLSearchParams(window.location.search);
             const dataVersion = urlParams.get('v'); 
@@ -395,7 +391,6 @@
                     let jsonString = "";
 
                     if (dataVersion === '2') {
-                        // Handle format baru (Kompresi Gzip - Pendek & Stabil untuk WA)
                         encodedData = encodedData.replace(/-/g, '+').replace(/_/g, '/');
                         while (encodedData.length % 4) { encodedData += '='; }
                         
@@ -407,7 +402,6 @@
                         }
                         jsonString = pako.inflate(bytes, { to: 'string' });
                     } else if (mode === 'user') {
-                        // Jalur pemulihan cadangan jika menggunakan link versi lama
                         jsonString = decodeURIComponent(atob(encodedData));
                     }
 
@@ -433,7 +427,6 @@
                         document.getElementById('out_ttd_nik').innerText = data.nik;
                         document.getElementById('out_label_tgl').innerText = data.tanggal;
 
-                        // Aktifkan Tampilan Terkunci Khusus User Kurir
                         document.getElementById('workspace_root').classList.add('user-mode-active');
                         document.getElementById('badge_mode').innerText = "Mode: User (Readonly)";
                         document.getElementById('badge_mode').className = "px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20 uppercase tracking-wider";
@@ -450,7 +443,6 @@
                     alert("Waduh, data link rusak atau kepotong saat dikirim lewat WA!");
                 }
             } else {
-                // Teks bawaan awal cetakan form
                 document.getElementById('box_evaluasi').value = "- Melakukan pelanggaran berupa penyetoran uang COD tidak pada hari yang sama. Sesuai ketentuan, seluruh uang COD wajib disetorkan maksimal pukul 23.59 pada setiap harinya, namun dilakukan penyetoran pada hari berikutnya.";
                 document.getElementById('box_penyebab').value = "- Keterlambatan penyetoran terjadi karena kurangnya kedisiplinan dan ketelitian dalam mematuhi prosedur operasional terkait batas waktu setor COD yang telah ditetapkan perusahaan.";
                 document.getElementById('box_commitment').value = "# Yang bersangkutan menyatakan memahami kesalahan yang telah dilakukan dan berkomitmen untuk:\nBerkomitmen untuk melakukan penyetoran uang COD tepat waktu setiap hari sebelum batas maksimal pukul 23.59, mematuhi seluruh SOP yang berlaku, serta tidak mengulangi pelanggaran yang sama di kemudian hari.";
