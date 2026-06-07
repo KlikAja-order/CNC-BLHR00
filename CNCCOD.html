@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CnC Enterprise Portal & Smart Link E-Sign System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #060913;
+            color: #f1f5f9;
+        }
+        .heading-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        /* DESIGN METRIC KERTAS STANDAR A4 RESMI PUSAT */
+        .preview-container {
+            font-family: 'Arial', sans-serif;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm 18mm;
+            background: #ffffff;
+            color: #000000 !important;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.7);
+            position: relative;
+            box-sizing: border-box;
+        }
+        .preview-container * {
+            color: #000000 !important;
+        }
+        .doc-title {
+            font-size: 14pt;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 0.5px;
+            margin-bottom: 25px;
+        }
+        /* Tabel Identitas Presisi Tinggi & Simetris */
+        .table-identitas {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 22px;
+        }
+        .table-identitas td {
+            border: 1px solid #000000;
+            padding: 0px 10px;
+            font-size: 10pt;
+            height: 34px;
+            vertical-align: middle;
+            box-sizing: border-box;
+        }
+        /* Form Box Bergaris Mengikuti Panjang Isian (Dynamic Content) */
+        .content-title {
+            font-size: 10.5pt;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+        .content-box {
+            border: 1px solid #000000;
+            padding: 10px 12px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            background: transparent;
+        }
+        /* Input & Textarea Dokumen Profesional */
+        .print-input {
+            width: 100%;
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-family: 'Arial', sans-serif !important;
+            font-size: 10pt !important;
+            color: #000000 !important;
+            resize: none;
+            overflow: hidden;
+            display: block;
+            vertical-align: middle;
+        }
+        .font-bold-input {
+            font-weight: bold !important;
+        }
+        /* KOLOM TANDA TANGAN DI PREVIEW PDF */
+        .signature-section {
+            font-size: 10pt;
+            margin-top: 35px;
+        }
+        .signature-row {
+            height: 110px;
+        }
+        /* Gaya Tampilan Read-Only Khusus User Kurir */
+        .user-mode-active .print-input {
+            pointer-events: none !important;
+            user-select: none !important;
+        }
+        @media print {
+            body { background: #ffffff; }
+            .no-print { display: none !important; }
+            .preview-container { box-shadow: none; padding: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col lg:flex-row">
+
+    <div class="w-full lg:w-[440px] p-6 lg:p-8 bg-slate-900/50 border-r border-slate-800/80 backdrop-blur-xl flex flex-col justify-between gap-6 no-print shrink-0">
+        <div>
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="h-8 w-2 bg-gradient-to-b from-orange-500 to-amber-500 rounded-full"></div>
+                    <h1 class="text-xl font-bold tracking-tight text-white heading-font">CnC Link-Generator</h1>
+                </div>
+                <span id="badge_mode" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-500/10 text-orange-400 border border-orange-500/20 uppercase tracking-wider">Mode: Atasan</span>
+            </div>
+
+            <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl mb-5 text-[11px] leading-relaxed font-light">
+                <div id="guide_title" class="flex items-center gap-2 text-amber-400 font-semibold uppercase tracking-wider mb-1.5">
+                    Mode Pengisian Atasan
+                </div>
+                <div id="guide_desc" class="text-slate-400">
+                    Silakan isi detail data dan evaluasi pada form berkas di sebelah kanan. Jangan lupa bubuhkan tanda tangan Anda di kotak bawah terlebih dahulu. Jika sudah selesai, klik tombol <strong>"Generate & Salin Link User"</strong> untuk dibagikan ke kurir.
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div id="pad_atasan_container" class="bg-slate-950/60 p-4 border border-slate-800/80 rounded-xl">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Tanda Tangan Atasan</span>
+                        <button type="button" onclick="clearSignature('canvas_atasan', 'img_render_atasan')" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-0.5 rounded transition-colors">Clear</button>
+                    </div>
+                    <canvas id="canvas_atasan" class="w-full h-60 bg-white rounded-lg border border-slate-700 touch-none" width="360" height="240"></canvas>
+                </div>
+
+                <div id="pad_karyawan_container" class="bg-slate-950/60 p-4 border border-slate-800/80 rounded-xl">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-semibold text-orange-400 uppercase tracking-wider">Tanda Tangan Karyawan / Satria</span>
+                        <button type="button" onclick="clearSignature('canvas_karyawan', 'img_render_karyawan')" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-0.5 rounded transition-colors">Clear</button>
+                    </div>
+                    <canvas id="canvas_karyawan" class="w-full h-60 bg-white rounded-lg border border-slate-700 touch-none" width="360" height="240"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-800/80 space-y-3">
+            <button id="btn_generate_share" onclick="generateAndCopyUserLink()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2.5 text-sm tracking-wide shadow-lg shadow-blue-500/10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                Generate & Salin Link User (WhatsApp)
+            </button>
+
+            <button onclick="downloadSecurePDF()" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2.5 text-sm tracking-wide shadow-lg shadow-orange-500/10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Download Dokumen PDF Resmi
+            </button>
+        </div>
+    </div>
+
+    <div id="workspace_root" class="flex-1 flex justify-center items-start lg:items-center p-4 lg:p-8 overflow-x-auto bg-[#04060b]">
+        <div id="pdf-content" class="preview-container my-auto">
+            
+            <div class="doc-title uppercase">
+                FORM COUNSELING & COMMITMENT
+            </div>
+
+            <table class="table-identitas">
+                <colgroup>
+                    <col style="width: 32%;">
+                    <col style="width: 3%;">
+                    <col style="width: 65%;">
+                </colgroup>
+                <tr class="font-bold">
+                    <td>Nama Karyawan</td>
+                    <td class="text-center" style="border-left: none; border-right: none;">:</td>
+                    <td class="p-0">
+                        <input type="text" id="out_nama" class="print-input font-bold-input px-2" value="Heru Pratama" placeholder="Ketik nama karyawan...">
+                    </td>
+                </tr>
+                <tr class="font-bold">
+                    <td>NIK</td>
+                    <td class="text-center" style="border-left: none; border-right: none;">:</td>
+                    <td class="p-0">
+                        <input type="text" id="out_nik" class="print-input font-bold-input px-2" value="10049109" placeholder="Ketik NIK...">
+                    </td>
+                </tr>
+                <tr class="font-bold">
+                    <td>Jabatan/Penempatan</td>
+                    <td class="text-center" style="border-left: none; border-right: none;">:</td>
+                    <td class="p-0">
+                        <input type="text" id="out_jabatan" class="print-input font-bold-input px-2" value="MITRA SATRIA / BLHR0" placeholder="Ketik jabatan...">
+                    </td>
+                </tr>
+                <tr class="font-bold">
+                    <td>Tempat/Waktu Counseling</td>
+                    <td class="text-center" style="border-left: none; border-right: none;">:</td>
+                    <td class="p-0">
+                        <input type="text" id="out_tanggal" class="print-input font-bold-input px-2" value="7 Juni 2026" placeholder="Ketik tanggal...">
+                    </td>
+                </tr>
+                <tr class="font-bold">
+                    <td>Pertemuan ke</td>
+                    <td class="text-center" style="border-left: none; border-right: none;">:</td>
+                    <td class="p-0">
+                        <input type="text" id="out_pertemuan" class="print-input font-bold-input px-2" value="1 (Satu)" placeholder="Pertemuan ke-...">
+                    </td>
+                </tr>
+            </table>
+
+            <div class="content-section">
+                <div class="content-title">1. Evaluasi Pelanggaran yang dilakukan:</div>
+                <div class="content-box">
+                    <textarea id="box_evaluasi" class="print-input" rows="1" placeholder="Ketik evaluasi pelanggaran di sini..." oninput="autoExpand(this)"></textarea>
+                </div>
+
+                <div class="content-title">2. Penyebab Pelanggaran berdasarkan hasil dari Evaluasi:</div>
+                <div class="content-box">
+                    <textarea id="box_penyebab" class="print-input" rows="1" placeholder="Ketik analisis penyebab di sini..." oninput="autoExpand(this)"></textarea>
+                </div>
+
+                <div class="content-title">3. Evaluasi & Commitment:</div>
+                <div class="content-box">
+                    <textarea id="box_commitment" class="print-input" rows="1" placeholder="Ketik komitmen karyawan di sini..." oninput="autoExpand(this)"></textarea>
+                </div>
+            </div>
+
+            <div class="text-[8.5pt] italic leading-tight text-black mt-4" style="text-align: justify;">
+                *Form ini berlaku sebagai Peringatan Lisan, jika Karyawan yang diberikan Counseling tidak dapat memenuhi Commitment dan melanggar Peraturan Perusahaan kembali, maka sanksi ini akan ditingkatkan ke Surat Peringatan (SP).
+            </div>
+
+            <div class="signature-section w-full">
+                <div class="mb-3">Gunungkidul, <span id="out_label_tgl" class="font-bold">7 Juni 2026</span></div>
+                
+                <table class="w-full table-fixed" style="border: none;">
+                    <tr>
+                        <td class="text-left font-bold" style="border: none; width: 55%; padding-bottom: 5px;">Atasan Pemberi Counseling</td>
+                        <td class="text-left font-bold" style="border: none; width: 45%; padding-bottom: 5px;">Karyawan Counseling</td>
+                    </tr>
+                    <tr class="signature-row">
+                        <td class="text-left relative" style="border: none; vertical-align: bottom;">
+                            <div class="absolute left-2 top-2 h-[95px] w-[180px] flex items-center justify-center">
+                                <img id="img_render_atasan" class="max-h-full max-w-full object-contain hidden" src="" alt="TTD Atasan">
+                            </div>
+                            <div class="font-bold uppercase tracking-wide" style="font-size: 10pt; border-top: 1px solid #000000; display: inline-block; min-width: 170px; padding-top: 4px;">KHAIRUL ASHARI</div>
+                            <div style="font-size: 9.5pt; margin-top: 2px;">NIK: 10069287</div>
+                        </td>
+                        <td class="text-left relative" style="border: none; vertical-align: bottom;">
+                            <div class="absolute left-4 top-2 h-[95px] w-[180px] flex items-center justify-center">
+                                <img id="img_render_karyawan" class="max-h-full max-w-full object-contain hidden" src="" alt="TTD Karyawan">
+                            </div>
+                            <div id="out_ttd_nama" class="font-bold uppercase tracking-wide" style="font-size: 10pt; border-top: 1px solid #000000; display: inline-block; min-width: 170px; padding-top: 4px;">HERU PRATAMA</div>
+                            <div style="font-size: 9.5pt; margin-top: 2px;">NIK: <span id="out_ttd_nik">10049109</span></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function autoExpand(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+
+        document.getElementById('out_nama').addEventListener('input', function() {
+            document.getElementById('out_ttd_nama').innerText = this.value.toUpperCase();
+        });
+        document.getElementById('out_nik').addEventListener('input', function() {
+            document.getElementById('out_ttd_nik').innerText = this.value;
+        });
+        document.getElementById('out_tanggal').addEventListener('input', function() {
+            document.getElementById('out_label_tgl').innerText = this.value;
+        });
+
+        // FUNGSI CLEAR YANG SUDAH DIPERBAIKI TOTAL & DIJAMIN VALID
+        function clearSignature(canvasId, imgRenderId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const imgRender = document.getElementById(imgRenderId);
+            
+            // Hapus coretan di kanvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Kosongkan source gambar di dokumen preview & sembunyikan kembali
+            imgRender.src = '';
+            imgRender.classList.add('hidden');
+        }
+
+        function setupSignaturePad(canvasId, imgRenderId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const imgRender = document.getElementById(imgRenderId);
+            
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3.5;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+
+            function getCoords(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: (clientX - rect.left) * (canvas.width / rect.width),
+                    y: (clientY - rect.top) * (canvas.height / rect.height)
+                };
+            }
+
+            function startDrawing(e) {
+                isDrawing = true;
+                const coords = getCoords(e);
+                [lastX, lastY] = [coords.x, coords.y];
+            }
+
+            function draw(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+                const coords = getCoords(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(coords.x, coords.y);
+                ctx.stroke();
+                [lastX, lastY] = [coords.x, coords.y];
+                sync();
+            }
+
+            function sync() {
+                imgRender.src = canvas.toDataURL('image/png');
+                imgRender.classList.remove('hidden');
+            }
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', () => isDrawing = false);
+            canvas.addEventListener('touchstart', startDrawing);
+            canvas.addEventListener('touchmove', draw);
+            canvas.addEventListener('touchend', () => isDrawing = false);
+        }
+
+        function generateAndCopyUserLink() {
+            const payload = {
+                nama: document.getElementById('out_nama').value,
+                nik: document.getElementById('out_nik').value,
+                jabatan: document.getElementById('out_jabatan').value,
+                tanggal: document.getElementById('out_tanggal').value,
+                pertemuan: document.getElementById('out_pertemuan').value,
+                evaluasi: document.getElementById('box_evaluasi').value,
+                penyebab: document.getElementById('box_penyebab').value,
+                commitment: document.getElementById('box_commitment').value,
+                ttdAtasan: document.getElementById('img_render_atasan').src
+            };
+
+            const jsonString = JSON.stringify(payload);
+            const encodedData = btoa(encodeURIComponent(jsonString));
+
+            const baseUrl = window.location.href.split('?')[0];
+            const shareableUrl = `${baseUrl}?mode=user&data=${encodedData}`;
+
+            navigator.clipboard.writeText(shareableUrl).then(() => {
+                alert("✓ BERHASIL! Link Khusus User telah disalin ke clipboard.\n\nSilakan langsung kirim (paste) tautan tersebut ke WhatsApp Kurir/User yang bersangkutan.");
+            }).catch(err => {
+                console.error("Gagal menyalin link: ", err);
+                prompt("Salin link user secara manual di bawah ini:", shareableUrl);
+            });
+        }
+
+        function checkUrlParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            const encodedData = urlParams.get('data');
+
+            if (mode === 'user' && encodedData) {
+                try {
+                    const decodedString = decodeURIComponent(atob(encodedData));
+                    const data = JSON.parse(decodedString);
+
+                    document.getElementById('out_nama').value = data.nama;
+                    document.getElementById('out_nik').value = data.nik;
+                    document.getElementById('out_jabatan').value = data.jabatan;
+                    document.getElementById('out_tanggal').value = data.tanggal;
+                    document.getElementById('out_pertemuan').value = data.pertemuan;
+                    document.getElementById('box_evaluasi').value = data.evaluasi;
+                    document.getElementById('box_penyebab').value = data.penyebab;
+                    document.getElementById('box_commitment').value = data.commitment;
+
+                    if (data.ttdAtasan && data.ttdAtasan !== window.location.href) {
+                        const imgAtasan = document.getElementById('img_render_atasan');
+                        imgAtasan.src = data.ttdAtasan;
+                        imgAtasan.classList.remove('hidden');
+                    }
+
+                    document.getElementById('out_ttd_nama').innerText = data.nama.toUpperCase();
+                    document.getElementById('out_ttd_nik').innerText = data.nik;
+                    document.getElementById('out_label_tgl').innerText = data.tanggal;
+
+                    document.getElementById('workspace_root').classList.add('user-mode-active');
+                    
+                    document.getElementById('badge_mode').innerText = "Mode: User (Readonly)";
+                    document.getElementById('badge_mode').className = "px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20 uppercase tracking-wider";
+                    document.getElementById('guide_title').innerText = "Portal Verifikasi & E-Sign Kurir";
+                    document.getElementById('guide_title').className = "flex items-center gap-2 text-green-400 font-semibold uppercase tracking-wider mb-1.5";
+                    document.getElementById('guide_desc').innerText = "Silakan baca hasil evaluasi dan komitmen kerja Anda di lembar kanan. Konten berkas telah dikunci dan tidak bisa diubah. Berikan tanda tangan Anda pada pad di bawah ini, lalu download file resmi PDF sebagai bukti.";
+                    
+                    document.getElementById('pad_atasan_container').classList.add('hidden');
+                    document.getElementById('btn_generate_share').classList.add('hidden');
+
+                } catch (e) {
+                    console.error("Gagal melakukan parsing data URL: ", e);
+                    alert("Waduh, data link rusak atau tidak valid!");
+                }
+            } else {
+                document.getElementById('box_evaluasi').value = "- Melakukan pelanggaran berupa penyetoran uang COD tidak pada hari yang sama. Sesuai ketentuan, seluruh uang COD wajib disetorkan maksimal pukul 23.59 pada setiap harinya, namun dilakukan penyetoran pada hari berikutnya.";
+                document.getElementById('box_penyebab').value = "- Keterlambatan penyetoran terjadi karena kurangnya kedisiplinan dan ketelitian dalam mematuhi prosedur operasional terkait batas waktu setor COD yang telah ditetapkan perusahaan.";
+                document.getElementById('box_commitment').value = "# Yang bersangkutan menyatakan memahami kesalahan yang telah dilakukan dan berkomitmen untuk:\nBerkomitmen untuk melakukan penyetoran uang COD tepat waktu setiap hari sebelum batas maksimal pukul 23.59, mematuhi seluruh SOP yang berlaku, serta tidak mengulangi pelanggaran yang sama di kemudian hari.";
+            }
+
+            ['box_evaluasi', 'box_penyebab', 'box_commitment'].forEach(id => autoExpand(document.getElementById(id)));
+        }
+
+        function downloadSecurePDF() {
+            const element = document.getElementById('pdf-content');
+            const kName = document.getElementById('out_nama').value.replace(/\s+/g, '_');
+            const kNik = document.getElementById('out_nik').value;
+            
+            const options = {
+                margin: 0,
+                filename: `Form_CnC_Signed_${kName}_${kNik}.pdf`,
+                image: { type: 'jpeg', quality: 1.0 },
+                html2canvas: { scale: 3, useCORS: true, letterRendering: true, dpi: 300 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(options).from(element).save();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setupSignaturePad('canvas_atasan', 'img_render_atasan');
+            setupSignaturePad('canvas_karyawan', 'img_render_karyawan');
+            checkUrlParameters();
+        });
+    </script>
+</body>
+</html>
