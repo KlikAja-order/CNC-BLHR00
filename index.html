@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CnC Enterprise Portal & Smart Link E-Sign System</title>
+    <title>CnC Smart Portal - Premium Operational Sign</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #060913;
-            color: #f1f5f9;
+            background-color: #090d16;
+            color: #f8fafc;
         }
-        .heading-font {
-            font-family: 'Space Grotesk', sans-serif;
+        .brand-font {
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         /* DESIGN METRIC KERTAS STANDAR A4 RESMI PUSAT */
         .preview-container {
@@ -27,7 +27,7 @@
             padding: 20mm 18mm;
             background: #ffffff;
             color: #000000 !important;
-            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.7);
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
             position: relative;
             box-sizing: border-box;
         }
@@ -41,7 +41,6 @@
             letter-spacing: 0.5px;
             margin-bottom: 25px;
         }
-        /* Tabel Identitas Presisi Tinggi & Simetris */
         .table-identitas {
             width: 100%;
             border-collapse: collapse;
@@ -55,7 +54,6 @@
             vertical-align: middle;
             box-sizing: border-box;
         }
-        /* Form Box Bergaris Mengikuti Panjang Isian (Dynamic Content) */
         .content-title {
             font-size: 10.5pt;
             font-weight: bold;
@@ -70,7 +68,6 @@
             margin-bottom: 15px;
             background: transparent;
         }
-        /* Input & Textarea Dokumen Profesional */
         .print-input {
             width: 100%;
             border: none !important;
@@ -86,13 +83,12 @@
             display: block;
             vertical-align: middle;
         }
-        .font-bold-input {
-            font-weight: bold !important;
-        }
-        /* KOLOM TANDA TANGAN DI PREVIEW PDF - STRUKTUR SIMETRIS */
+        .font-bold-input { font-weight: bold !important; }
+        
+        /* STRUKTUR TANDA TANGAN 100% SIMETRIS PARALEL */
         .signature-section {
             font-size: 10pt;
-            margin-top: 35px;
+            margin-top: 40px;
         }
         .table-ttd {
             width: 100%;
@@ -106,17 +102,17 @@
             padding: 0px 15px;
         }
         .wrapper-render-ttd {
-            height: 90px;
+            height: 95px;
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
         .wrapper-render-ttd img {
-            max-height: 90px;
-            max-width: 160px;
-            object-contain: contain;
+            max-height: 95px;
+            max-width: 150px;
+            object-fit: contain;
         }
         .garis-nama-ttd {
             border-top: 1px solid #000000;
@@ -125,13 +121,17 @@
             font-weight: bold;
             text-transform: uppercase;
             font-size: 10pt;
-            padding-top: 4px;
+            padding-top: 5px;
             letter-spacing: 0.3px;
         }
         .sub-nik-ttd {
             text-align: center;
             font-size: 9.5pt;
-            margin-top: 1px;
+            margin-top: 2px;
+        }
+        .user-mode-active .print-input {
+            pointer-events: none !important;
+            user-select: none !important;
         }
         @media print {
             body { background: #ffffff; }
@@ -140,68 +140,51 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col lg:flex-row">
+<body class="min-h-screen flex flex-col lg:flex-row antialiased">
 
-    <div class="w-full lg:w-[440px] p-6 lg:p-8 bg-slate-900/50 border-r border-slate-800/80 backdrop-blur-xl flex flex-col justify-between gap-6 no-print shrink-0">
+    <div class="w-full lg:w-[420px] p-6 lg:p-8 bg-[#0f1524] border-r border-slate-800/60 flex flex-col justify-between gap-8 no-print shrink-0 shadow-2xl">
         <div>
-            <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-3">
-                    <div class="h-8 w-2 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-full"></div>
-                    <h1 class="text-xl font-bold tracking-tight text-white heading-font">CnC Portal E-Sign</h1>
-                </div>
-                <select id="role_selector" onchange="switchRoleMode()" class="bg-slate-950 text-xs font-semibold text-slate-300 border border-slate-800 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer">
-                    <option value="atasan">Mode: Atasan</option>
-                    <option value="kurir">Mode: Kurir</option>
-                </select>
-            </div>
-
-            <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl mb-5 text-[11px] leading-relaxed">
-                <div id="guide_title" class="flex items-center gap-2 text-blue-400 font-semibold uppercase tracking-wider mb-1">
-                    Langkah Kerja Atasan
-                </div>
-                <div id="guide_desc" class="text-slate-400">
-                    Isi detail evaluasi form di kanan, bubuhkan tanda tangan Anda, lalu klik tombol <strong>"Simpan Data & Kirim ke Kurir"</strong> di bawah.
-                </div>
-            </div>
-
-            <div id="container_upload_file" class="hidden mb-5 p-4 bg-slate-950 border border-dashed border-slate-700 rounded-xl">
-                <label class="block text-xs font-medium text-slate-400 mb-2">Upload File Berkas dari Atasan (.cnc)</label>
-                <input type="file" id="file_import" accept=".cnc" onchange="importDataFile(this)" class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer" />
-            </div>
-
-            <div class="space-y-4">
-                <div id="pad_atasan_container" class="bg-slate-950/60 p-4 border border-slate-800/80 rounded-xl flex flex-col items-center">
-                    <div class="flex justify-between items-center mb-2 w-full">
-                        <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Gores TTD Atasan</span>
-                        <button type="button" onclick="clearSignature('canvas_atasan', 'img_render_atasan')" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-0.5 rounded transition-colors">Clear</button>
+                    <div class="h-9 w-2.5 bg-blue-500 rounded-full shadow-lg shadow-blue-500/40"></div>
+                    <div>
+                        <h1 class="text-lg font-bold text-white tracking-tight brand-font">CnC Smart Portal</h1>
+                        <p class="text-[10px] text-slate-400 tracking-wider uppercase">Short Link E-Sign System</p>
                     </div>
-                    <canvas id="canvas_atasan" class="w-[250px] h-[250px] bg-white rounded-lg border border-slate-700 touch-none" width="250" height="250"></canvas>
                 </div>
+                <span id="badge_mode" class="text-[10px] font-bold px-2.5 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 uppercase tracking-wider">Mode: Atasan</span>
+            </div>
 
-                <div id="pad_karyawan_container" class="bg-slate-950/60 p-4 border border-slate-800/80 rounded-xl flex flex-col items-center hidden">
-                    <div class="flex justify-between items-center mb-2 w-full">
-                        <span class="text-xs font-semibold text-orange-400 uppercase tracking-wider">Gores TTD Kurir / Satria</span>
-                        <button type="button" onclick="clearSignature('canvas_karyawan', 'img_render_karyawan')" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-0.5 rounded transition-colors">Clear</button>
-                    </div>
-                    <canvas id="canvas_karyawan" class="w-[250px] h-[250px] bg-white rounded-lg border border-slate-700 touch-none" width="250" height="250"></canvas>
+            <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-xl mb-6 text-xs leading-relaxed text-slate-300">
+                <div id="guide_title" class="text-blue-400 font-semibold tracking-wide mb-1 brand-font">LANGKAH KERJA ATASAN</div>
+                <div id="guide_desc">Sesuaikan isi data evaluasi dan komitmen di formulir kertas sebelah kanan. Tanda tangan gambar Anda otomatis dimuat dari sistem. Cukup klik tombol <strong>"Generate & Salin Link Pendek"</strong> jika sudah siap dikirim ke kurir melalui WhatsApp.</div>
+            </div>
+
+            <div id="container_pad_kurir" class="hidden bg-slate-900/40 p-5 border border-slate-800/80 rounded-2xl flex flex-col items-center">
+                <div class="flex justify-between items-center mb-3 w-full">
+                    <span class="text-xs font-medium text-slate-300 tracking-wide">Gores Tanda Tangan Anda di Sini:</span>
+                    <button type="button" onclick="clearSignature('canvas_karyawan', 'img_render_karyawan')" class="text-[10px] text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-md transition-all">Clear</button>
+                </div>
+                <div class="bg-white rounded-xl overflow-hidden p-1 border border-slate-700 shadow-inner">
+                    <canvas id="canvas_karyawan" class="w-[230px] h-[230px] bg-white cursor-crosshair touch-none" width="230" height="230"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="pt-4 border-t border-slate-800/80 space-y-3">
-            <button id="btn_export_data" onclick="exportDataFile()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2.5 text-sm tracking-wide shadow-lg shadow-blue-500/10">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Simpan Data & Kirim ke Kurir
+        <div class="pt-6 border-t border-slate-800/60 space-y-3">
+            <button id="btn_generate_link" onclick="generateShortUserLink()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2.5 text-sm tracking-wide shadow-lg shadow-blue-600/20 active:scale-[0.98]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                Generate & Salin Link Pendek
             </button>
 
-            <button onclick="downloadSecurePDF()" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2.5 text-sm tracking-wide shadow-lg shadow-orange-500/10">
+            <button onclick="downloadSecurePDF()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2.5 text-sm tracking-wide shadow-lg shadow-emerald-600/20 active:scale-[0.98]">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 Download Dokumen PDF Resmi
             </button>
         </div>
     </div>
 
-    <div id="workspace_root" class="flex-1 flex justify-center items-start lg:items-center p-4 lg:p-8 overflow-x-auto bg-[#04060b]">
+    <div id="workspace_root" class="flex-1 flex justify-center items-start lg:items-center p-4 lg:p-8 overflow-x-auto bg-[#090d16]">
         <div id="pdf-content" class="preview-container my-auto">
             
             <div class="doc-title uppercase">
@@ -273,17 +256,17 @@
             </div>
 
             <div class="signature-section w-full">
-                <div class="mb-4 text-left">Gunungkidul, <span id="out_label_tgl" class="font-bold">7 Juni 2026</span></div>
+                <div class="mb-5 text-left">Gunungkidul, <span id="out_label_tgl" class="font-bold">7 Juni 2026</span></div>
                 
                 <table class="table-ttd">
                     <tr>
-                        <td class="text-center font-bold" style="padding-bottom: 5px; text-align: center;">Atasan Pemberi Counseling</td>
-                        <td class="text-center font-bold" style="padding-bottom: 5px; text-align: center;">Karyawan Counseling</td>
+                        <td style="text-align: center; font-weight: bold; padding-bottom: 5px;">Atasan Pemberi Counseling</td>
+                        <td style="text-align: center; font-weight: bold; padding-bottom: 5px;">Karyawan Counseling</td>
                     </tr>
                     <tr>
                         <td>
                             <div class="wrapper-render-ttd">
-                                <img id="img_render_atasan" class="hidden" src="" alt="TTD Atasan">
+                                <img id="img_atasan_permanent" src="20231202_101015.png" alt="TTD Atasan" onerror="this.style.display='none';">
                             </div>
                             <div class="garis-nama-ttd">KHAIRUL ASHARI</div>
                             <div class="sub-nik-ttd">NIK: 10069287</div>
@@ -318,34 +301,6 @@
             document.getElementById('out_label_tgl').innerText = this.value;
         });
 
-        // MANAGEMENT PERPINDAHAN PERAN (ROLE MODE)
-        function switchRoleMode() {
-            const currentRole = document.getElementById('role_selector').value;
-            const previewContainer = document.getElementById('workspace_root');
-
-            if (currentRole === 'kurir') {
-                document.getElementById('guide_title').innerText = "Langkah Kerja Kurir / Satria";
-                document.getElementById('guide_title').className = "flex items-center gap-2 text-green-400 font-semibold uppercase tracking-wider mb-1";
-                document.getElementById('guide_desc').innerText = "Silakan upload file berkas (.cnc) yang dikirim atasan Anda, isi tanda tangan di kotak bawah, lalu download hasil PDF-nya.";
-                
-                document.getElementById('container_upload_file').classList.remove('hidden');
-                document.getElementById('pad_karyawan_container').classList.remove('hidden');
-                document.getElementById('pad_atasan_container').classList.add('hidden');
-                document.getElementById('btn_export_data').classList.add('hidden');
-                previewContainer.classList.add('user-mode-active');
-            } else {
-                document.getElementById('guide_title').innerText = "Langkah Kerja Atasan";
-                document.getElementById('guide_title').className = "flex items-center gap-2 text-blue-400 font-semibold uppercase tracking-wider mb-1";
-                document.getElementById('guide_desc').innerText = "Isi detail evaluasi form di kanan, bubuhkan tanda tangan Anda, lalu klik tombol \"Simpan Data & Kirim ke Kurir\" di bawah.";
-                
-                document.getElementById('container_upload_file').classList.add('hidden');
-                document.getElementById('pad_karyawan_container').classList.add('hidden');
-                document.getElementById('pad_atasan_container').classList.remove('hidden');
-                document.getElementById('btn_export_data').classList.remove('hidden');
-                previewContainer.classList.remove('user-mode-active');
-            }
-        }
-
         function clearSignature(canvasId, imgRenderId) {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
@@ -357,6 +312,7 @@
 
         function setupSignaturePad(canvasId, imgRenderId) {
             const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
             const imgRender = document.getElementById(imgRenderId);
             
@@ -379,13 +335,12 @@
                 };
             }
 
-            function startDrawing(e) {
+            canvas.addEventListener('mousedown', (e) => {
                 isDrawing = true;
                 const coords = getCoords(e);
                 [lastX, lastY] = [coords.x, coords.y];
-            }
-
-            function draw(e) {
+            });
+            canvas.addEventListener('mousemove', (e) => {
                 if (!isDrawing) return;
                 e.preventDefault();
                 const coords = getCoords(e);
@@ -394,90 +349,102 @@
                 ctx.lineTo(coords.x, coords.y);
                 ctx.stroke();
                 [lastX, lastY] = [coords.x, coords.y];
-                sync();
-            }
-
-            function sync() {
                 imgRender.src = canvas.toDataURL('image/png');
                 imgRender.classList.remove('hidden');
-            }
+            });
+            window.addEventListener('mouseup', () => isDrawing = false);
 
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', () => isDrawing = false);
-            canvas.addEventListener('touchstart', startDrawing);
-            canvas.addEventListener('touchmove', draw);
-            canvas.addEventListener('touchend', () => isDrawing = false);
+            canvas.addEventListener('touchstart', (e) => {
+                isDrawing = true;
+                const coords = getCoords(e);
+                [lastX, lastY] = [coords.x, coords.y];
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                if (!isDrawing) return;
+                e.preventDefault();
+                const coords = getCoords(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(coords.x, coords.y);
+                ctx.stroke();
+                [lastX, lastY] = [coords.x, coords.y];
+                imgRender.src = canvas.toDataURL('image/png');
+                imgRender.classList.remove('hidden');
+            });
+            window.addEventListener('touchend', () => isDrawing = false);
         }
 
-        // EXPORT LOGIC: MEMBUAT FILE PORTABLE KECIL UNTUK DIKIRIM KE WA
-        function exportDataFile() {
-            const kName = document.getElementById('out_nama').value;
+        // GENERATE LINK SUPER PENDEK (HANYA BERISI DATA TEKS)
+        function generateShortUserLink() {
             const payload = {
-                nama: kName,
-                nik: document.getElementById('out_nik').value,
-                jabatan: document.getElementById('out_jabatan').value,
-                tanggal: document.getElementById('out_tanggal').value,
-                pertemuan: document.getElementById('out_pertemuan').value,
-                evaluasi: document.getElementById('box_evaluasi').value,
-                penyebab: document.getElementById('box_penyebab').value,
-                commitment: document.getElementById('box_commitment').value,
-                ttdAtasan: document.getElementById('img_render_atasan').classList.contains('hidden') ? "" : document.getElementById('img_render_atasan').src
+                n: document.getElementById('out_nama').value,
+                k: document.getElementById('out_nik').value,
+                j: document.getElementById('out_jabatan').value,
+                t: document.getElementById('out_tanggal').value,
+                p: document.getElementById('out_pertemuan').value,
+                e: document.getElementById('box_evaluasi').value,
+                y: document.getElementById('box_penyebab').value,
+                c: document.getElementById('box_commitment').value
             };
 
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload));
-            const downloadAnchor = document.createElement('a');
-            const fileCleanName = kName.replace(/\s+/g, '_');
-            
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `Berkas_CnC_${fileCleanName}.cnc`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
+            try {
+                const base64Data = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+                const baseUrl = window.location.href.split('?')[0];
+                const cleanShortUrl = `${baseUrl}?data=${base64Data}`;
 
-            // Berikan template teks pengantar otomatis untuk mempermudah instruksi WhatsApp ke kurir
-            const waMessage = `Halo, berikut berkas digital dokumen Counseling & Commitment Anda.\n\nSilakan buka tautan portal web: ${window.location.href.split('?')[0]}\n1. Ubah mode di kiri atas ke *Mode: Kurir*.\n2. Upload file berkas (*.cnc*) yang saya lampirkan ini.\n3. Isi tanda tangan Anda langsung di layar HP.\n4. Klik tombol *Download Dokumen PDF Resmi*. Terima kasih.`;
-            navigator.clipboard.writeText(waMessage);
-
-            alert("✓ SUKSES!\n1. File data '.cnc' otomatis terunduh di HP/Komputer Anda.\n2. Teks petunjuk instruksi pengisian otomatis tersalin ke Clipboard.\n\nSilakan kirim FILE '.cnc' beserta PASTE instruksi tadi ke WhatsApp Kurir!");
+                navigator.clipboard.writeText(cleanShortUrl).then(() => {
+                    alert("✓ LINK SUPER PENDEK BERHASIL DI-GENERATE!\nLink sudah otomatis tersalin. Silakan langsung paste (kirim) ke WhatsApp Kurir.");
+                }).catch(() => {
+                    prompt("Gagal auto-copy, silakan salin manual link pendek ini:", cleanShortUrl);
+                });
+            } catch (error) {
+                alert("Gagal memproses link data!");
+            }
         }
 
-        // IMPORT LOGIC: MEMBACA FILE PORTABLE YANG DIUPLOAD KURIR
-        function importDataFile(input) {
-            const file = input.files[0];
-            if (!file) return;
+        // MEMBACA URL SAAT LINK DIBUKA OLEH KURIR
+        function parseUrlData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const encodedData = urlParams.get('data');
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
+            if (encodedData) {
                 try {
-                    const data = JSON.parse(e.target.result);
+                    const decodedJson = decodeURIComponent(escape(atob(encodedData)));
+                    const data = JSON.parse(decodedJson);
 
-                    document.getElementById('out_nama').value = data.nama;
-                    document.getElementById('out_nik').value = data.nik;
-                    document.getElementById('out_jabatan').value = data.jabatan;
-                    document.getElementById('out_tanggal').value = data.tanggal;
-                    document.getElementById('out_pertemuan').value = data.pertemuan;
-                    document.getElementById('box_evaluasi').value = data.evaluasi;
-                    document.getElementById('box_penyebab').value = data.penyebab;
-                    document.getElementById('box_commitment').value = data.commitment;
+                    document.getElementById('out_nama').value = data.n;
+                    document.getElementById('out_nik').value = data.k;
+                    document.getElementById('out_jabatan').value = data.j;
+                    document.getElementById('out_tanggal').value = data.t;
+                    document.getElementById('out_pertemuan').value = data.p;
+                    document.getElementById('box_evaluasi').value = data.e;
+                    document.getElementById('box_penyebab').value = data.y;
+                    document.getElementById('box_commitment').value = data.c;
 
-                    if (data.ttdAtasan) {
-                        const imgAtasan = document.getElementById('img_render_atasan');
-                        imgAtasan.src = data.ttdAtasan;
-                        imgAtasan.classList.remove('hidden');
-                    }
+                    document.getElementById('out_ttd_nama').innerText = data.n.toUpperCase();
+                    document.getElementById('out_ttd_nik').innerText = data.k;
+                    document.getElementById('out_label_tgl').innerText = data.t;
 
-                    document.getElementById('out_ttd_nama').innerText = data.nama.toUpperCase();
-                    document.getElementById('out_ttd_nik').innerText = data.nik;
-                    document.getElementById('out_label_tgl').innerText = data.tanggal;
-
-                    ['box_evaluasi', 'box_penyebab', 'box_commitment'].forEach(id => autoExpand(document.getElementById(id)));
-                    alert("✓ Berkas Berhasil Dimuat! Silakan isi tanda tangan Kurir di bawah panel kontrol.");
-                } catch (err) {
-                    alert("Gagal membaca berkas! Pastikan file benar.");
+                    // Mengubah Antarmuka khusus untuk Kurir (Read-only & Muncul Kotak TTD)
+                    document.getElementById('workspace_root').classList.add('user-mode-active');
+                    document.getElementById('badge_mode').innerText = "Mode: Kurir / Satria";
+                    document.getElementById('badge_mode').className = "text-[10px] font-bold px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 uppercase tracking-wider";
+                    
+                    document.getElementById('guide_title').innerText = "PORTAL VERIFIKASI & E-SIGN KURIR";
+                    document.getElementById('guide_desc').innerText = "Silakan periksa detail komitmen hasil counseling Anda di berkas sebelah kanan. Jika sudah sesuai, bubuhkan tanda tangan Anda pada kotak di bawah ini, kemudian klik 'Download Dokumen PDF Resmi'.";
+                    
+                    document.getElementById('container_pad_kurir').classList.remove('hidden');
+                    document.getElementById('btn_generate_link').classList.add('hidden');
+                } catch (e) {
+                    alert("Link berkas salah atau tidak lengkap!");
                 }
-            };
-            reader.readAsText(file);
+            } else {
+                // Isian default awal di layar atasan
+                document.getElementById('box_evaluasi').value = "- Melakukan pelanggaran berupa penyetoran uang COD tidak pada hari yang sama. Sesuai ketentuan, seluruh uang COD wajib disetorkan maksimal pukul 23.59 pada setiap harinya, namun dilakukan penyetoran pada hari berikutnya.";
+                document.getElementById('box_penyebab').value = "- Keterlambatan penyetoran terjadi karena kurangnya kedisiplinan dan ketelitian dalam mematuhi prosedur operasional terkait batas waktu setor COD yang telah ditetapkan perusahaan.";
+                document.getElementById('box_commitment').value = "# Yang bersangkutan menyatakan memahami kesalahan yang telah dilakukan dan berkomitmen untuk:\nBerkomitmen untuk melakukan penyetoran uang COD tepat waktu setiap hari sebelum batas maksimal pukul 23.59, mematuhi seluruh SOP yang berlaku, serta tidak mengulangi pelanggaran yang sama di kemudian hari.";
+            }
+            ['box_evaluasi', 'box_penyebab', 'box_commitment'].forEach(id => autoExpand(document.getElementById(id)));
         }
 
         function downloadSecurePDF() {
@@ -496,15 +463,8 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            setupSignaturePad('canvas_atasan', 'img_render_atasan');
             setupSignaturePad('canvas_karyawan', 'img_render_karyawan');
-            
-            // Set value default text diawal
-            document.getElementById('box_evaluasi').value = "- Melakukan pelanggaran berupa penyetoran uang COD tidak pada hari yang sama. Sesuai ketentuan, seluruh uang COD wajib disetorkan maksimal pukul 23.59 pada setiap harinya, namun dilakukan penyetoran pada hari berikutnya.";
-            document.getElementById('box_penyebab').value = "- Keterlambatan penyetoran terjadi karena kurangnya kedisiplinan dan ketelitian dalam mematuhi prosedur operasional terkait batas waktu setor COD yang telah ditetapkan perusahaan.";
-            document.getElementById('box_commitment').value = "# Yang bersangkutan menyatakan memahami kesalahan yang telah dilakukan dan berkomitmen untuk:\nBerkomitmen untuk melakukan penyetoran uang COD tepat waktu setiap hari sebelum batas maksimal pukul 23.59, mematuhi seluruh SOP yang berlaku, serta tidak mengulangi pelanggaran yang sama di kemudian hari.";
-            
-            ['box_evaluasi', 'box_penyebab', 'box_commitment'].forEach(id => autoExpand(document.getElementById(id)));
+            parseUrlData();
         });
     </script>
 </body>
