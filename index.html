@@ -67,6 +67,8 @@
             box-sizing: border-box;
             margin-bottom: 15px;
             background: transparent;
+            word-wrap: break-word;
+            word-break: break-word;
         }
         .print-input {
             width: 100%;
@@ -81,8 +83,19 @@
             resize: none;
             overflow: hidden;
             display: block;
-            vertical-align: middle;
         }
+        
+        /* SOLUSI ANTI POTONG: Tampilkan div isi saat cetak/render PDF */
+        .print-div-view {
+            display: none;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Arial', sans-serif !important;
+            font-size: 10pt !important;
+            line-height: 1.4;
+            color: #000000 !important;
+        }
+        
         .font-bold-input { font-weight: bold !important; }
         
         /* STRUKTUR TANDA TANGAN 100% SIMETRIS PARALEL */
@@ -237,17 +250,20 @@
             <div class="content-section">
                 <div class="content-title">1. Evaluasi Pelanggaran yang dilakukan:</div>
                 <div class="content-box">
-                    <textarea id="box_evaluasi" class="print-input" rows="1" placeholder="Ketik evaluasi pelanggaran di sini..." oninput="autoExpand(this)"></textarea>
+                    <textarea id="box_evaluasi" class="print-input" rows="1" placeholder="Ketik evaluasi pelanggaran di sini..." oninput="syncToDiv(this, 'div_evaluasi')"></textarea>
+                    <div id="div_evaluasi" class="print-div-view"></div>
                 </div>
 
                 <div class="content-title">2. Penyebab Pelanggaran berdasarkan hasil dari Evaluasi:</div>
                 <div class="content-box">
-                    <textarea id="box_penyebab" class="print-input" rows="1" placeholder="Ketik analisis penyebab di sini..." oninput="autoExpand(this)"></textarea>
+                    <textarea id="box_penyebab" class="print-input" rows="1" placeholder="Ketik analisis penyebab di sini..." oninput="syncToDiv(this, 'div_penyebab')"></textarea>
+                    <div id="div_penyebab" class="print-div-view"></div>
                 </div>
 
                 <div class="content-title">3. Evaluasi & Commitment:</div>
                 <div class="content-box">
-                    <textarea id="box_commitment" class="print-input" rows="1" placeholder="Ketik komitmen karyawan di sini..." oninput="autoExpand(this)"></textarea>
+                    <textarea id="box_commitment" class="print-input" rows="1" placeholder="Ketik komitmen karyawan di sini..." oninput="syncToDiv(this, 'div_commitment')"></textarea>
+                    <div id="div_commitment" class="print-div-view"></div>
                 </div>
             </div>
 
@@ -286,9 +302,15 @@
     </div>
 
     <script>
-        function autoExpand(textarea) {
+        // Sinkronisasi isi dari textarea ke div penampung anti-potong PDF
+        function syncToDiv(textarea, divId) {
             textarea.style.height = 'auto';
             textarea.style.height = textarea.scrollHeight + 'px';
+            
+            const targetDiv = document.getElementById(divId);
+            if (targetDiv) {
+                targetDiv.innerText = textarea.value;
+            }
         }
 
         document.getElementById('out_nama').addEventListener('input', function() {
@@ -374,7 +396,7 @@
             window.addEventListener('touchend', () => isDrawing = false);
         }
 
-        // GENERATE LINK SUPER PENDEK (HANYA BERISI DATA TEKS)
+        // GENERATE LINK SUPER PENDEK (HANYA BERISI DATA TEKS ORIGINAL)
         function generateShortUserLink() {
             const payload = {
                 n: document.getElementById('out_nama').value,
@@ -444,10 +466,23 @@
                 document.getElementById('box_penyebab').value = "- Keterlambatan penyetoran terjadi karena kurangnya kedisiplinan dan ketelitian dalam mematuhi prosedur operasional terkait batas waktu setor COD yang telah ditetapkan perusahaan.";
                 document.getElementById('box_commitment').value = "# Yang bersangkutan menyatakan memahami kesalahan yang telah dilakukan dan berkomitmen untuk:\nBerkomitmen untuk melakukan penyetoran uang COD tepat waktu setiap hari sebelum batas maksimal pukul 23.59, mematuhi seluruh SOP yang berlaku, serta tidak mengulangi pelanggaran yang sama di kemudian hari.";
             }
-            ['box_evaluasi', 'box_penyebab', 'box_commitment'].forEach(id => autoExpand(document.getElementById(id)));
+            
+            // Inisialisasi sinkronisasi data awal ke penampung div cetak
+            ['box_evaluasi', 'box_penyebab', 'box_commitment'].forEach(id => {
+                const tx = document.getElementById(id);
+                const suffix = id.replace('box_', 'div_');
+                syncToDiv(tx, suffix);
+            });
         }
 
         function downloadSecurePDF() {
+            // Sembunyikan textarea dan tampilkan div view secara paksa saat render agar html2pdf membaca struktur tinggi asli teks tanpa terpotong
+            const textareas = document.querySelectorAll('.content-box textarea');
+            const divs = document.querySelectorAll('.print-div-view');
+            
+            textareas.forEach(t => t.style.display = 'none');
+            divs.forEach(d => d.style.display = 'block');
+
             const element = document.getElementById('pdf-content');
             const kName = document.getElementById('out_nama').value.replace(/\s+/g, '_');
             const kNik = document.getElementById('out_nik').value;
@@ -459,7 +494,12 @@
                 html2canvas: { scale: 3, useCORS: true, letterRendering: true, dpi: 300 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf().set(options).from(element).save();
+
+            html2pdf().set(options).from(element).save().then(() => {
+                // Kembalikan ke tampilan semula (textarea aktif kembali dengan teks utuh Anda)
+                textareas.forEach(t => t.style.display = 'block');
+                divs.forEach(d => d.style.display = 'none');
+            });
         }
 
         window.addEventListener('DOMContentLoaded', () => {
