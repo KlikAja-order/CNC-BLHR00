@@ -20,12 +20,12 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
         
-        /* DESIGN METRIC FORMULIR FORMAL & SIMETRIS */
+        /* DESIGN METRIC FORMULIR - SEJAJAR & PAS HALAMAN */
         .preview-container {
             font-family: 'Arial', sans-serif;
-            width: 800px; /* Lebar optimal pas dengan rasio A4 html2pdf */
+            width: 720px; /* Lebar aman agar tidak terpotong di kanan */
             min-height: auto; 
-            padding: 40px 50px;
+            padding: 35px 40px;
             background: #ffffff;
             color: #000000 !important;
             box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
@@ -37,37 +37,38 @@
             color: #000000 !important;
         }
         .doc-title {
-            font-size: 15pt;
+            font-size: 14pt;
             font-weight: bold;
             text-align: center;
             letter-spacing: 0.5px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         .table-identitas {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            table-layout: fixed;
         }
         .table-identitas td {
             border: 1px solid #000000;
-            padding: 8px 12px;
+            padding: 6px 10px;
             font-size: 10pt;
-            height: 38px;
+            height: 36px;
             vertical-align: middle;
             box-sizing: border-box;
         }
         .content-title {
-            font-size: 10.5pt;
+            font-size: 10pt;
             font-weight: bold;
-            margin-top: 18px;
-            margin-bottom: 6px;
+            margin-top: 15px;
+            margin-bottom: 5px;
         }
         .content-box {
             border: 1px solid #000000;
-            padding: 12px 14px;
+            padding: 10px 12px;
             width: 100%;
             box-sizing: border-box;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             background: transparent;
         }
         .print-input {
@@ -85,7 +86,7 @@
             display: block;
             white-space: pre-wrap;
             word-wrap: break-word;
-            line-height: 1.5;
+            line-height: 1.4;
         }
         
         /* Div View penampung cetak paragraf utuh */
@@ -95,17 +96,17 @@
             word-wrap: break-word;
             font-family: 'Arial', sans-serif !important;
             font-size: 10pt !important;
-            line-height: 1.5;
+            line-height: 1.4;
             color: #000000 !important;
             text-align: justify;
         }
         
         .font-bold-input { font-weight: bold !important; }
         
-        /* RESTRUKTURISASI AREA TANDA TANGAN SIMETRIS & EMULASI TINTA BIRU */
+        /* AREA TANDA TANGAN STRUKTUR KOKOH & PRESISI */
         .signature-section {
             font-size: 10pt;
-            margin-top: 45px;
+            margin-top: 35px;
             width: 100%;
         }
         .table-ttd {
@@ -119,40 +120,29 @@
             width: 50%;
             vertical-align: bottom;
             text-align: center;
-            padding: 0px 40px;
-            position: relative;
+            padding: 0px 20px;
         }
         
-        /* Kontainer TTD Overlap (Menabrak Nama) */
+        /* Wadah TTD Dinamis - Diturunkan agar menabrak garis & nama */
         .wrapper-render-ttd {
-            height: 120px;
+            height: 90px;
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: absolute;
-            bottom: -5px; /* Menarik TTD ke bawah agar pas menabrak garis nama */
-            left: 0;
-            right: 0;
+            margin-bottom: -18px; /* Trik memaksa TTD turun menabrak komponen nama */
+            position: relative;
             z-index: 10;
-            pointer-events: none;
         }
-        
-        /* Mengubah TTD hitam bawaan gambar menjadi biru pulpen resmi via CSS Filter */
-        .blue-ink-filter {
-            filter: brightness(0.4) sepia(1) saturate(15) hue-rotate(190deg);
-        }
-        
         .wrapper-render-ttd img {
-            max-height: 120px;
-            max-width: 200px;
+            max-height: 110px; /* Ukuran diperbesar secara proporsional */
+            max-width: 180px;
             object-fit: contain;
-            display: block;
-            margin: 0 auto;
-        }
-        .space-pembatas-ttd {
-            height: 105px; /* Ruang kosong untuk background TTD */
-            width: 100%;
+            transform: scale(1.15); /* Perbesar skala visual agar coretan meluber ke nama */
+            
+            /* Trik emulasi warna tinta biru semi-gelap korporat */
+            mix-blend-mode: multiply;
+            background-color: rgba(0, 51, 170, 0.05); 
         }
         .garis-nama-ttd {
             border-top: 1px solid #000000;
@@ -161,7 +151,7 @@
             font-weight: bold;
             text-transform: uppercase;
             font-size: 10pt;
-            padding-top: 6px;
+            padding-top: 5px;
             letter-spacing: 0.3px;
             position: relative;
             z-index: 5;
@@ -169,7 +159,7 @@
         .sub-nik-ttd {
             text-align: center;
             font-size: 9.5pt;
-            margin-top: 3px;
+            margin-top: 2px;
         }
         .user-mode-active .print-input {
             pointer-events: none !important;
@@ -199,12 +189,12 @@
 
             <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-xl mb-6 text-xs leading-relaxed text-slate-300">
                 <div id="guide_title" class="text-blue-400 font-semibold tracking-wide mb-1 brand-font">LANGKAH KERJA ATASAN</div>
-                <div id="guide_desc">Sesuaikan isi data evaluasi dan komitmen di formulir kertas sebelah kanan. Tanda tangan gambar Anda otomatis dimuat dari sistem dengan warna tinta biru pulpen. Klik tombol <strong>"Generate & Salin Link Pendek"</strong> untuk mengirim berkas ini ke Kurir.</div>
+                <div id="guide_desc">Sesuaikan isi data evaluasi dan komitmen di formulir kertas sebelah kanan. Tanda tangan Anda otomatis dimuat menabrak komponen nama. Klik tombol <strong>"Generate & Salin Link Pendek"</strong> untuk mengirim berkas ini ke Kurir melalui WhatsApp.</div>
             </div>
 
             <div id="container_pad_kurir" class="hidden bg-slate-900/40 p-5 border border-slate-800/80 rounded-2xl flex flex-col items-center">
                 <div class="flex justify-between items-center mb-3 w-full">
-                    <span class="text-xs font-medium text-slate-300 tracking-wide">Gores Tanda Tangan Anda di Sini:</span>
+                    <span class="text-xs font-medium text-slate-300 tracking-wide">Gores Tanda Tangan Anda di Sini (Otomatis Biru):</span>
                     <button type="button" onclick="clearSignature('canvas_karyawan', 'img_render_karyawan')" class="text-[10px] text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-md transition-all">Clear</button>
                 </div>
                 <div class="bg-white rounded-xl overflow-hidden p-1 border border-slate-700 shadow-inner">
@@ -235,9 +225,9 @@
 
             <table class="table-identitas">
                 <colgroup>
-                    <col style="width: 32%;">
-                    <col style="width: 3%;">
-                    <col style="width: 65%;">
+                    <col style="width: 30%;">
+                    <col style="width: 4%;">
+                    <col style="width: 66%;">
                 </colgroup>
                 <tr class="font-bold">
                     <td>Nama Karyawan</td>
@@ -296,29 +286,27 @@
                 </div>
             </div>
 
-            <div class="text-[8.5pt] italic leading-tight text-black mt-5" style="text-align: justify;">
+            <div class="text-[8.5pt] italic leading-tight text-black mt-4" style="text-align: justify;">
                 *Form ini berlaku sebagai Peringatan Lisan, jika Karyawan yang diberikan Counseling tidak dapat memenuhi Commitment dan melanggar Peraturan Perusahaan kembali, maka sanksi ini akan ditingkatkan ke Surat Peringatan (SP).
             </div>
 
             <div class="signature-section">
-                <div class="mb-6 text-left">Gunungkidul, <span id="out_label_tgl" class="font-bold">7 Juni 2026</span></div>
+                <div class="mb-12 text-left">Gunungkidul, <span id="out_label_tgl" class="font-bold">7 Juni 2026</span></div>
                 
                 <table class="table-ttd">
                     <tr>
-                        <td style="font-weight: bold; padding-bottom: 10px;">Atasan Pemberi Counseling</td>
-                        <td style="font-weight: bold; padding-bottom: 10px;">Karyawan Counseling</td>
+                        <td style="font-weight: bold; padding-bottom: 75px;">Atasan Pemberi Counseling</td>
+                        <td style="font-weight: bold; padding-bottom: 75px;">Karyawan Counseling</td>
                     </tr>
                     <tr>
                         <td>
-                            <div class="space-pembatas-ttd"></div>
                             <div class="wrapper-render-ttd">
-                                <img id="img_atasan_permanent" class="blue-ink-filter" src="20231202_101015.png" alt="TTD Atasan" onerror="this.style.display='none';">
+                                <img id="img_atasan_permanent" src="20231202_101015.png" alt="TTD Atasan" onerror="this.style.display='none';">
                             </div>
                             <div class="garis-nama-ttd">KHAIRUL ASHARI</div>
                             <div class="sub-nik-ttd">NIK: 10069287</div>
                         </td>
                         <td>
-                            <div class="space-pembatas-ttd"></div>
                             <div class="wrapper-render-ttd">
                                 <img id="img_render_karyawan" class="hidden" src="" alt="TTD Karyawan">
                             </div>
@@ -378,9 +366,9 @@
             const ctx = canvas.getContext('2d');
             const imgRender = document.getElementById(imgRenderId);
             
-            // Mengubah warna goresan canvas kurir menjadi biru pulpen resmi (#0033aa)
+            // Set goresan tinta menjadi biru pulpen gelap resmi (#0033aa)
             ctx.strokeStyle = '#0033aa';
-            ctx.lineWidth = 4.2; 
+            ctx.lineWidth = 4.0; 
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
 
@@ -399,25 +387,6 @@
             }
 
             canvas.addEventListener('mousedown', (e) => {
-                isDrawing = true;
-                const coords = getCoords(e);
-                [lastX, lastY] = [coords.x, coords.y];
-            });
-            canvas.addEventListener('mousemove', (e) => {
-                if (!isDrawing) return;
-                e.preventDefault();
-                const coords = getCoords(e);
-                ctx.beginPath();
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(coords.x, coords.y);
-                ctx.stroke();
-                [lastX, lastY] = [coords.x, coords.y];
-                imgRender.src = canvas.toDataURL('image/png');
-                imgRender.classList.remove('hidden');
-            });
-            window.addEventListener('mouseup', () => isDrawing = false);
-
-            canvas.addEventListener('touchstart', (e) => {
                 isDrawing = true;
                 const coords = getCoords(e);
                 [lastX, lastY] = [coords.x, coords.y];
@@ -474,7 +443,7 @@
                 const cleanShortUrl = `${baseUrl}?data=${base64Data}`;
 
                 navigator.clipboard.writeText(cleanShortUrl).then(() => {
-                    alert("✓ LINK SUPER PENDEK BERHASIL DI-GENERATE!\nLink sudah otomatis tersalin. Silakan langsung paste (kirim) ke WhatsApp Kurir.");
+                    alert("✓ LINK SUPER PENDEK BERHASIL DI-GENERATE!\nLink sudah otomatis tersalin. Silakan langsung paste ke WhatsApp Kurir.");
                 }).catch(() => {
                     prompt("Gagal auto-copy, silakan salin manual link pendek ini:", cleanShortUrl);
                 });
@@ -547,10 +516,10 @@
             const kNik = document.getElementById('out_nik').value;
             
             const options = {
-                margin: [12, 12, 12, 12], 
+                margin: [15, 12, 15, 12], 
                 filename: `Form_CnC_Signed_${kName}_${kNik}.pdf`,
                 image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { scale: 2.5, useCORS: true, letterRendering: true, logging: false },
+                html2canvas: { scale: 3, useCORS: true, letterRendering: true, logging: false },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['avoid-all', 'css'] }
             };
