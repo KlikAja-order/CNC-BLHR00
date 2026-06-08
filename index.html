@@ -19,12 +19,12 @@
         .brand-font {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        /* DESIGN METRIC KERTAS STANDAR A4 RESMI PUSAT */
+        /* KERTAS DINAMIS MENGIKUTI PANJANG KALIMAT */
         .preview-container {
             font-family: 'Arial', sans-serif;
-            width: 210mm;
-            min-height: 297mm;
-            padding: 20mm 18mm;
+            width: 790px; /* Lebar standar visual mantap */
+            min-height: auto; 
+            padding: 25mm 20mm;
             background: #ffffff;
             color: #000000 !important;
             box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
@@ -62,13 +62,11 @@
         }
         .content-box {
             border: 1px solid #000000;
-            padding: 10px 12px;
+            padding: 12px 14px;
             width: 100%;
             box-sizing: border-box;
             margin-bottom: 15px;
             background: transparent;
-            word-wrap: break-word;
-            word-break: break-word;
         }
         .print-input {
             width: 100%;
@@ -83,22 +81,26 @@
             resize: none;
             overflow: hidden;
             display: block;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.5;
         }
         
-        /* SOLUSI ANTI POTONG: Tampilkan div isi saat cetak/render PDF */
+        /* Div View untuk render teks paragraf utuh anti-potong */
         .print-div-view {
             display: none;
             white-space: pre-wrap;
             word-wrap: break-word;
             font-family: 'Arial', sans-serif !important;
             font-size: 10pt !important;
-            line-height: 1.4;
+            line-height: 1.5;
             color: #000000 !important;
+            text-align: justify;
         }
         
         .font-bold-input { font-weight: bold !important; }
         
-        /* STRUKTUR TANDA TANGAN 100% SIMETRIS PARALEL */
+        /* STRUKTUR TANDA TANGAN BESAR & MENABRAK NAMA */
         .signature-section {
             font-size: 10pt;
             margin-top: 40px;
@@ -113,18 +115,21 @@
             width: 50%;
             vertical-align: bottom;
             padding: 0px 15px;
+            position: relative;
         }
         .wrapper-render-ttd {
-            height: 95px;
+            height: 140px; /* Ukuran diperbesar */
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 8px;
+            margin-bottom: -15px; /* Membuat TTD agak menabrak/tumpang tindih dengan nama di bawahnya */
+            z-index: 10;
+            position: relative;
         }
         .wrapper-render-ttd img {
-            max-height: 95px;
-            max-width: 150px;
+            max-height: 140px; /* Maksimal TTD diperbesar */
+            max-width: 220px;
             object-fit: contain;
         }
         .garis-nama-ttd {
@@ -136,6 +141,8 @@
             font-size: 10pt;
             padding-top: 5px;
             letter-spacing: 0.3px;
+            position: relative;
+            z-index: 5;
         }
         .sub-nik-ttd {
             text-align: center;
@@ -149,7 +156,7 @@
         @media print {
             body { background: #ffffff; }
             .no-print { display: none !important; }
-            .preview-container { box-shadow: none; padding: 0; }
+            .preview-container { box-shadow: none; padding: 0; width: 100% !important; }
         }
     </style>
 </head>
@@ -197,7 +204,7 @@
         </div>
     </div>
 
-    <div id="workspace_root" class="flex-1 flex justify-center items-start lg:items-center p-4 lg:p-8 overflow-x-auto bg-[#090d16]">
+    <div id="workspace_root" class="flex-1 flex justify-center items-start p-4 lg:p-8 overflow-x-auto bg-[#090d16]">
         <div id="pdf-content" class="preview-container my-auto">
             
             <div class="doc-title uppercase">
@@ -313,6 +320,17 @@
             }
         }
 
+        // Auto-expand tinggi textarea bawaan biar selalu pas saat diedit
+        function autoExpandTextareas() {
+            ['box_evaluasi', 'box_penyebab', 'box_commitment'].forEach(id => {
+                const tx = document.getElementById(id);
+                if(tx) {
+                    tx.style.height = 'auto';
+                    tx.style.height = tx.scrollHeight + 'px';
+                }
+            });
+        }
+
         document.getElementById('out_nama').addEventListener('input', function() {
             document.getElementById('out_ttd_nama').innerText = this.value.toUpperCase();
         });
@@ -339,7 +357,7 @@
             const imgRender = document.getElementById(imgRenderId);
             
             ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 3.5;
+            ctx.lineWidth = 4.0; // Sedikit ditebalkan biar proporsional saat besar
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
 
@@ -396,7 +414,6 @@
             window.addEventListener('touchend', () => isDrawing = false);
         }
 
-        // GENERATE LINK SUPER PENDEK (HANYA BERISI DATA TEKS ORIGINAL)
         function generateShortUserLink() {
             const payload = {
                 n: document.getElementById('out_nama').value,
@@ -424,7 +441,6 @@
             }
         }
 
-        // MEMBACA URL SAAT LINK DIBUKA OLEH KURIR
         function parseUrlData() {
             const urlParams = new URLSearchParams(window.location.search);
             const encodedData = urlParams.get('data');
@@ -447,7 +463,6 @@
                     document.getElementById('out_ttd_nik').innerText = data.k;
                     document.getElementById('out_label_tgl').innerText = data.t;
 
-                    // Mengubah Antarmuka khusus untuk Kurir (Read-only & Muncul Kotak TTD)
                     document.getElementById('workspace_root').classList.add('user-mode-active');
                     document.getElementById('badge_mode').innerText = "Mode: Kurir / Satria";
                     document.getElementById('badge_mode').className = "text-[10px] font-bold px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 uppercase tracking-wider";
@@ -461,26 +476,29 @@
                     alert("Link berkas salah atau tidak lengkap!");
                 }
             } else {
-                // Isian default awal di layar atasan
                 document.getElementById('box_evaluasi').value = "- Melakukan pelanggaran berupa penyetoran uang COD tidak pada hari yang sama. Sesuai ketentuan, seluruh uang COD wajib disetorkan maksimal pukul 23.59 pada setiap harinya, namun dilakukan penyetoran pada hari berikutnya.";
                 document.getElementById('box_penyebab').value = "- Keterlambatan penyetoran terjadi karena kurangnya kedisiplinan dan ketelitian dalam mematuhi prosedur operasional terkait batas waktu setor COD yang telah ditetapkan perusahaan.";
                 document.getElementById('box_commitment').value = "# Yang bersangkutan menyatakan memahami kesalahan yang telah dilakukan dan berkomitmen untuk:\nBerkomitmen untuk melakukan penyetoran uang COD tepat waktu setiap hari sebelum batas maksimal pukul 23.59, mematuhi seluruh SOP yang berlaku, serta tidak mengulangi pelanggaran yang sama di kemudian hari.";
             }
             
-            // Inisialisasi sinkronisasi data awal ke penampung div cetak
             ['box_evaluasi', 'box_penyebab', 'box_commitment'].forEach(id => {
                 const tx = document.getElementById(id);
                 const suffix = id.replace('box_', 'div_');
                 syncToDiv(tx, suffix);
             });
+            autoExpandTextareas();
         }
 
         function downloadSecurePDF() {
-            // Sembunyikan textarea dan tampilkan div view secara paksa saat render agar html2pdf membaca struktur tinggi asli teks tanpa terpotong
+            // Maksimalkan tinggi textarea agar semua teks terlihat utuh sebelum diproses html2pdf
             const textareas = document.querySelectorAll('.content-box textarea');
             const divs = document.querySelectorAll('.print-div-view');
             
-            textareas.forEach(t => t.style.display = 'none');
+            textareas.forEach(t => {
+                t.style.height = 'auto';
+                t.style.height = t.scrollHeight + 'px';
+                t.style.display = 'none';
+            });
             divs.forEach(d => d.style.display = 'block');
 
             const element = document.getElementById('pdf-content');
@@ -488,23 +506,31 @@
             const kNik = document.getElementById('out_nik').value;
             
             const options = {
-                margin: 0,
+                margin: [10, 10, 10, 10], // Margin PDF aman
                 filename: `Form_CnC_Signed_${kName}_${kNik}.pdf`,
                 image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { scale: 3, useCORS: true, letterRendering: true, dpi: 300 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas: { scale: 2.5, useCORS: true, letterRendering: true, logging: false },
+                // Pengaturan kertas elastis dinamis tanpa memotong halaman sembarangan
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css'] }
             };
 
             html2pdf().set(options).from(element).save().then(() => {
-                // Kembalikan ke tampilan semula (textarea aktif kembali dengan teks utuh Anda)
+                // Kembalikan ke layout editor setelah download selesai
                 textareas.forEach(t => t.style.display = 'block');
                 divs.forEach(d => d.style.display = 'none');
+                autoExpandTextareas();
             });
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             setupSignaturePad('canvas_karyawan', 'img_render_karyawan');
             parseUrlData();
+            
+            // Listener tambahan agar tinggi kotak input mengikuti ketikan pengguna secara live
+            ['box_evaluasi', 'box_penyebab', 'box_commitment'].forEach(id => {
+                document.getElementById(id).addEventListener('input', autoExpandTextareas);
+            });
         });
     </script>
 </body>
