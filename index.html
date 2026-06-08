@@ -19,46 +19,48 @@
         .brand-font {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        /* KERTAS DINAMIS MENGIKUTI PANJANG KALIMAT */
+        
+        /* DESIGN METRIC FORMULIR FORMAL & SIMETRIS */
         .preview-container {
             font-family: 'Arial', sans-serif;
-            width: 790px; /* Lebar standar visual mantap */
+            width: 800px; /* Lebar optimal pas dengan rasio A4 html2pdf */
             min-height: auto; 
-            padding: 25mm 20mm;
+            padding: 40px 50px;
             background: #ffffff;
             color: #000000 !important;
             box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
             position: relative;
             box-sizing: border-box;
+            margin: auto;
         }
         .preview-container * {
             color: #000000 !important;
         }
         .doc-title {
-            font-size: 14pt;
+            font-size: 15pt;
             font-weight: bold;
             text-align: center;
             letter-spacing: 0.5px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
         .table-identitas {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 22px;
+            margin-bottom: 25px;
         }
         .table-identitas td {
             border: 1px solid #000000;
-            padding: 0px 10px;
+            padding: 8px 12px;
             font-size: 10pt;
-            height: 34px;
+            height: 38px;
             vertical-align: middle;
             box-sizing: border-box;
         }
         .content-title {
             font-size: 10.5pt;
             font-weight: bold;
-            margin-top: 15px;
-            margin-bottom: 5px;
+            margin-top: 18px;
+            margin-bottom: 6px;
         }
         .content-box {
             border: 1px solid #000000;
@@ -86,7 +88,7 @@
             line-height: 1.5;
         }
         
-        /* Div View untuk render teks paragraf utuh anti-potong */
+        /* Div View penampung cetak paragraf utuh */
         .print-div-view {
             display: none;
             white-space: pre-wrap;
@@ -100,37 +102,57 @@
         
         .font-bold-input { font-weight: bold !important; }
         
-        /* STRUKTUR TANDA TANGAN BESAR & MENABRAK NAMA */
+        /* RESTRUKTURISASI AREA TANDA TANGAN SIMETRIS & EMULASI TINTA BIRU */
         .signature-section {
             font-size: 10pt;
-            margin-top: 40px;
+            margin-top: 45px;
+            width: 100%;
         }
         .table-ttd {
             width: 100%;
             border-collapse: collapse;
             border: none !important;
+            table-layout: fixed;
         }
         .table-ttd td {
             border: none !important;
             width: 50%;
             vertical-align: bottom;
-            padding: 0px 15px;
+            text-align: center;
+            padding: 0px 40px;
             position: relative;
         }
+        
+        /* Kontainer TTD Overlap (Menabrak Nama) */
         .wrapper-render-ttd {
-            height: 140px; /* Ukuran diperbesar */
+            height: 120px;
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: -15px; /* Membuat TTD agak menabrak/tumpang tindih dengan nama di bawahnya */
+            position: absolute;
+            bottom: -5px; /* Menarik TTD ke bawah agar pas menabrak garis nama */
+            left: 0;
+            right: 0;
             z-index: 10;
-            position: relative;
+            pointer-events: none;
         }
+        
+        /* Mengubah TTD hitam bawaan gambar menjadi biru pulpen resmi via CSS Filter */
+        .blue-ink-filter {
+            filter: brightness(0.4) sepia(1) saturate(15) hue-rotate(190deg);
+        }
+        
         .wrapper-render-ttd img {
-            max-height: 140px; /* Maksimal TTD diperbesar */
-            max-width: 220px;
+            max-height: 120px;
+            max-width: 200px;
             object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+        .space-pembatas-ttd {
+            height: 105px; /* Ruang kosong untuk background TTD */
+            width: 100%;
         }
         .garis-nama-ttd {
             border-top: 1px solid #000000;
@@ -139,7 +161,7 @@
             font-weight: bold;
             text-transform: uppercase;
             font-size: 10pt;
-            padding-top: 5px;
+            padding-top: 6px;
             letter-spacing: 0.3px;
             position: relative;
             z-index: 5;
@@ -147,7 +169,7 @@
         .sub-nik-ttd {
             text-align: center;
             font-size: 9.5pt;
-            margin-top: 2px;
+            margin-top: 3px;
         }
         .user-mode-active .print-input {
             pointer-events: none !important;
@@ -177,7 +199,7 @@
 
             <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-xl mb-6 text-xs leading-relaxed text-slate-300">
                 <div id="guide_title" class="text-blue-400 font-semibold tracking-wide mb-1 brand-font">LANGKAH KERJA ATASAN</div>
-                <div id="guide_desc">Sesuaikan isi data evaluasi dan komitmen di formulir kertas sebelah kanan. Tanda tangan gambar Anda otomatis dimuat dari sistem. Cukup klik tombol <strong>"Generate & Salin Link Pendek"</strong> jika sudah siap dikirim ke kurir melalui WhatsApp.</div>
+                <div id="guide_desc">Sesuaikan isi data evaluasi dan komitmen di formulir kertas sebelah kanan. Tanda tangan gambar Anda otomatis dimuat dari sistem dengan warna tinta biru pulpen. Klik tombol <strong>"Generate & Salin Link Pendek"</strong> untuk mengirim berkas ini ke Kurir.</div>
             </div>
 
             <div id="container_pad_kurir" class="hidden bg-slate-900/40 p-5 border border-slate-800/80 rounded-2xl flex flex-col items-center">
@@ -274,27 +296,29 @@
                 </div>
             </div>
 
-            <div class="text-[8.5pt] italic leading-tight text-black mt-4" style="text-align: justify;">
+            <div class="text-[8.5pt] italic leading-tight text-black mt-5" style="text-align: justify;">
                 *Form ini berlaku sebagai Peringatan Lisan, jika Karyawan yang diberikan Counseling tidak dapat memenuhi Commitment dan melanggar Peraturan Perusahaan kembali, maka sanksi ini akan ditingkatkan ke Surat Peringatan (SP).
             </div>
 
-            <div class="signature-section w-full">
-                <div class="mb-5 text-left">Gunungkidul, <span id="out_label_tgl" class="font-bold">7 Juni 2026</span></div>
+            <div class="signature-section">
+                <div class="mb-6 text-left">Gunungkidul, <span id="out_label_tgl" class="font-bold">7 Juni 2026</span></div>
                 
                 <table class="table-ttd">
                     <tr>
-                        <td style="text-align: center; font-weight: bold; padding-bottom: 5px;">Atasan Pemberi Counseling</td>
-                        <td style="text-align: center; font-weight: bold; padding-bottom: 5px;">Karyawan Counseling</td>
+                        <td style="font-weight: bold; padding-bottom: 10px;">Atasan Pemberi Counseling</td>
+                        <td style="font-weight: bold; padding-bottom: 10px;">Karyawan Counseling</td>
                     </tr>
                     <tr>
                         <td>
+                            <div class="space-pembatas-ttd"></div>
                             <div class="wrapper-render-ttd">
-                                <img id="img_atasan_permanent" src="20231202_101015.png" alt="TTD Atasan" onerror="this.style.display='none';">
+                                <img id="img_atasan_permanent" class="blue-ink-filter" src="20231202_101015.png" alt="TTD Atasan" onerror="this.style.display='none';">
                             </div>
                             <div class="garis-nama-ttd">KHAIRUL ASHARI</div>
                             <div class="sub-nik-ttd">NIK: 10069287</div>
                         </td>
                         <td>
+                            <div class="space-pembatas-ttd"></div>
                             <div class="wrapper-render-ttd">
                                 <img id="img_render_karyawan" class="hidden" src="" alt="TTD Karyawan">
                             </div>
@@ -309,7 +333,6 @@
     </div>
 
     <script>
-        // Sinkronisasi isi dari textarea ke div penampung anti-potong PDF
         function syncToDiv(textarea, divId) {
             textarea.style.height = 'auto';
             textarea.style.height = textarea.scrollHeight + 'px';
@@ -320,7 +343,6 @@
             }
         }
 
-        // Auto-expand tinggi textarea bawaan biar selalu pas saat diedit
         function autoExpandTextareas() {
             ['box_evaluasi', 'box_penyebab', 'box_commitment'].forEach(id => {
                 const tx = document.getElementById(id);
@@ -356,8 +378,9 @@
             const ctx = canvas.getContext('2d');
             const imgRender = document.getElementById(imgRenderId);
             
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 4.0; // Sedikit ditebalkan biar proporsional saat besar
+            // Mengubah warna goresan canvas kurir menjadi biru pulpen resmi (#0033aa)
+            ctx.strokeStyle = '#0033aa';
+            ctx.lineWidth = 4.2; 
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
 
@@ -376,6 +399,25 @@
             }
 
             canvas.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                const coords = getCoords(e);
+                [lastX, lastY] = [coords.x, coords.y];
+            });
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDrawing) return;
+                e.preventDefault();
+                const coords = getCoords(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(coords.x, coords.y);
+                ctx.stroke();
+                [lastX, lastY] = [coords.x, coords.y];
+                imgRender.src = canvas.toDataURL('image/png');
+                imgRender.classList.remove('hidden');
+            });
+            window.addEventListener('mouseup', () => isDrawing = false);
+
+            canvas.addEventListener('touchstart', (e) => {
                 isDrawing = true;
                 const coords = getCoords(e);
                 [lastX, lastY] = [coords.x, coords.y];
@@ -490,7 +532,6 @@
         }
 
         function downloadSecurePDF() {
-            // Maksimalkan tinggi textarea agar semua teks terlihat utuh sebelum diproses html2pdf
             const textareas = document.querySelectorAll('.content-box textarea');
             const divs = document.querySelectorAll('.print-div-view');
             
@@ -506,17 +547,15 @@
             const kNik = document.getElementById('out_nik').value;
             
             const options = {
-                margin: [10, 10, 10, 10], // Margin PDF aman
+                margin: [12, 12, 12, 12], 
                 filename: `Form_CnC_Signed_${kName}_${kNik}.pdf`,
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { scale: 2.5, useCORS: true, letterRendering: true, logging: false },
-                // Pengaturan kertas elastis dinamis tanpa memotong halaman sembarangan
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['avoid-all', 'css'] }
             };
 
             html2pdf().set(options).from(element).save().then(() => {
-                // Kembalikan ke layout editor setelah download selesai
                 textareas.forEach(t => t.style.display = 'block');
                 divs.forEach(d => d.style.display = 'none');
                 autoExpandTextareas();
@@ -527,7 +566,6 @@
             setupSignaturePad('canvas_karyawan', 'img_render_karyawan');
             parseUrlData();
             
-            // Listener tambahan agar tinggi kotak input mengikuti ketikan pengguna secara live
             ['box_evaluasi', 'box_penyebab', 'box_commitment'].forEach(id => {
                 document.getElementById(id).addEventListener('input', autoExpandTextareas);
             });
