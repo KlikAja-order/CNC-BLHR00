@@ -20,7 +20,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
         
-        /* STANDARISASI RASIO CETAK FORMAL */
+        /* PREVIEW CONTAINER ELASTIS */
         .preview-container {
             font-family: 'Arial', sans-serif;
             width: 100%;
@@ -48,7 +48,6 @@
             border-collapse: collapse;
             margin-bottom: 20px;
             table-layout: fixed;
-            page-break-inside: avoid;
         }
         .table-identitas td {
             border: 1px solid #000000;
@@ -71,7 +70,6 @@
             margin-bottom: 12px;
             background: transparent;
             min-height: 45px;
-            page-break-inside: avoid;
         }
         .print-input {
             width: 100%;
@@ -103,12 +101,11 @@
         }
         .font-bold-input { font-weight: bold !important; }
         
-        /* KOMPAK DAN RAPID SIGNATURE SECTION */
+        /* STRUKTUR TANDA TANGAN DI-DIESEL PERSEMPIT */
         .signature-section {
             font-size: 10pt;
             margin-top: 25px;
             width: 100%;
-            page-break-inside: avoid;
         }
         .table-ttd {
             width: 100%;
@@ -123,24 +120,24 @@
             text-align: center;
         }
         .wrapper-render-ttd {
-            height: 60px; /* Diperkecil agar space tanda tangan tidak memakan ruang berlebih */
+            height: 50px; /* Diperkecil agar menghemat ruang vertical */
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: -2px; 
+            margin-bottom: -5px; /* Menempel erat dengan garis nama */
             position: relative;
             z-index: 10;
         }
         .wrapper-render-ttd img {
-            max-height: 65px;
-            max-width: 180px;
+            max-height: 55px;
+            max-width: 160px;
             object-fit: contain;
         }
         .garis-nama-ttd {
             border-top: 1px solid #000000;
             width: 85%;
             margin: 0 auto;
-            padding-top: 5px;
+            padding-top: 3px; /* Jarak teks ke garis dipersempit */
             font-weight: bold;
             text-transform: uppercase;
             font-size: 10pt;
@@ -173,7 +170,7 @@
 
             <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-xl mb-6 text-xs leading-relaxed text-slate-300">
                 <div id="guide_title" class="text-blue-400 font-semibold tracking-wide mb-1 brand-font">LANGKAH KERJA ATASAN</div>
-                <div id="guide_desc">Sesuaikan data konseling. Tinggi formulir otomatis fleksibel mengikuti panjang teks saat diexport ke PDF tanpa terpotong. Gunakan tombol di bawah untuk share shortlink.</div>
+                <div id="guide_desc">Sesuaikan data konseling. Panjang halaman PDF akan otomatis fleksibel mengikuti total panjang kalimat isian Anda agar selalu muat dalam 1 halaman tunggal.</div>
             </div>
 
             <div id="container_pad_kurir" class="hidden bg-slate-900/40 p-5 border border-slate-800/80 rounded-2xl flex flex-col items-center">
@@ -275,12 +272,12 @@
             </div>
 
             <div class="signature-section">
-                <div class="mb-6 text-left">Gunungkidul, <span id="out_label_tgl" class="font-bold">7 Juni 2026</span></div>
+                <div class="mb-4 text-left">Gunungkidul, <span id="out_label_tgl" class="font-bold">7 Juni 2026</span></div>
                 
                 <table class="table-ttd">
                     <tr>
-                        <td style="font-weight: bold; padding-bottom: 25px;">Atasan Pemberi Counseling</td>
-                        <td style="font-weight: bold; padding-bottom: 25px;">Karyawan Counseling</td>
+                        <td style="font-weight: bold; padding-bottom: 10px;">Atasan Pemberi Counseling</td>
+                        <td style="font-weight: bold; padding-bottom: 10px;">Karyawan Counseling</td>
                     </tr>
                     <tr>
                         <td>
@@ -288,14 +285,14 @@
                                 <img id="img_atasan_permanent" src="20231202_101015.png" alt="TTD Atasan" onerror="this.style.display='none';">
                             </div>
                             <div class="garis-nama-ttd">KHAIRUL ASHARI</div>
-                            <div class="text-center text-[9.5pt] mt-1">NIK: 10069287</div>
+                            <div class="text-center text-[9.5pt] mt-0.5">NIK: 10069287</div>
                         </td>
                         <td>
                             <div class="wrapper-render-ttd">
                                 <img id="img_render_karyawan" class="hidden" src="" alt="TTD Karyawan">
                             </div>
                             <div id="out_ttd_nama" class="garis-nama-ttd">HERU PRATAMA</div>
-                            <div class="text-center text-[9.5pt] mt-1">NIK: <span id="out_ttd_nik">10049109</span></div>
+                            <div class="text-center text-[9.5pt] mt-0.5">NIK: <span id="out_ttd_nik">10049109</span></div>
                         </td>
                     </tr>
                 </table>
@@ -493,13 +490,21 @@
             const element = document.getElementById('pdf-content');
             const kName = document.getElementById('out_nama').value.replace(/\s+/g, '_');
             
+            // HITUNG TINGGI ELEMEN ASLI UNTUK DINAMISASI HALAMAN
+            const elementHeightPx = element.offsetHeight;
+            const elementWidthPx = element.offsetWidth;
+            
+            // Konversi proporsional ukuran lebar A4 (210mm) ke tinggi kustom milimeter
+            const pdfWidthMm = 210;
+            const pdfHeightMm = (elementHeightPx / elementWidthPx) * pdfWidthMm;
+
             const options = {
-                margin: [10, 15, 10, 15], 
+                margin: [8, 12, 8, 12], 
                 filename: `Form_CnC_Signed_${kName}.pdf`,
                 image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { scale: 2.5, useCORS: true, letterRendering: true, logging: false },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all'] } // Memaksa engine menjaga kesatuan objek agar pas 1 halaman penuh
+                html2canvas: { scale: 2.3, useCORS: true, letterRendering: true, logging: false },
+                // MENGGUNAKAN TINGGI HILIR YANG DINAMIS AGAR SELALU 1 HALAMAN UTUH
+                jsPDF: { unit: 'mm', format: [pdfWidthMm, pdfHeightMm + 20], orientation: 'portrait' }
             };
 
             html2pdf().set(options).from(element).save().then(() => {
