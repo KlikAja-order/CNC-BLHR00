@@ -26,7 +26,7 @@
             width: 100%;
             max-width: 760px;
             min-height: auto; 
-            padding: 35px 45px;
+            padding: 30px 40px; /* Diperkecil sedikit agar menghemat ruang */
             background: #ffffff;
             color: #000000 !important;
             box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
@@ -101,11 +101,12 @@
         }
         .font-bold-input { font-weight: bold !important; }
         
-        /* STRUKTUR TANDA TANGAN DI-DIESEL PERSEMPIT */
+        /* STRUKTUR TANDA TANGAN */
         .signature-section {
             font-size: 10pt;
-            margin-top: 25px;
+            margin-top: 30px;
             width: 100%;
+            page-break-inside: avoid; /* Mencegah TTD terpecah antar halaman */
         }
         .table-ttd {
             width: 100%;
@@ -120,16 +121,16 @@
             text-align: center;
         }
         .wrapper-render-ttd {
-            height: 50px; /* Diperkecil agar menghemat ruang vertical */
+            height: 65px; 
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: -5px; /* Menempel erat dengan garis nama */
+            margin-bottom: 2px;
             position: relative;
             z-index: 10;
         }
         .wrapper-render-ttd img {
-            max-height: 55px;
+            max-height: 65px;
             max-width: 160px;
             object-fit: contain;
         }
@@ -137,7 +138,7 @@
             border-top: 1px solid #000000;
             width: 85%;
             margin: 0 auto;
-            padding-top: 3px; /* Jarak teks ke garis dipersempit */
+            padding-top: 4px;
             font-weight: bold;
             text-transform: uppercase;
             font-size: 10pt;
@@ -214,14 +215,14 @@
                     <td>Nama Karyawan</td>
                     <td class="text-center" style="border-left: none; border-right: none;">:</td>
                     <td class="p-0">
-                        <input type="text" id="out_nama" class="print-input font-bold-input px-2" value="Heru Pratama">
+                        <input type="text" id="out_nama" class="print-input font-bold-input px-2" value="KHARISMA NANDA IRVANSYAH">
                     </td>
                 </tr>
                 <tr class="font-bold">
                     <td>NIK</td>
                     <td class="text-center" style="border-left: none; border-right: none;">:</td>
                     <td class="p-0">
-                        <input type="text" id="out_nik" class="print-input font-bold-input px-2" value="10049109">
+                        <input type="text" id="out_nik" class="print-input font-bold-input px-2" value="10085125">
                     </td>
                 </tr>
                 <tr class="font-bold">
@@ -235,14 +236,14 @@
                     <td>Tempat/Waktu Counseling</td>
                     <td class="text-center" style="border-left: none; border-right: none;">:</td>
                     <td class="p-0">
-                        <input type="text" id="out_tanggal" class="print-input font-bold-input px-2" value="7 Juni 2026">
+                        <input type="text" id="out_tanggal" class="print-input font-bold-input px-2" value="17 Juni 2026">
                     </td>
                 </tr>
                 <tr class="font-bold">
                     <td>Pertemuan ke</td>
                     <td class="text-center" style="border-left: none; border-right: none;">:</td>
                     <td class="p-0">
-                        <input type="text" id="out_pertemuan" class="print-input font-bold-input px-2" value="1 (Satu)">
+                        <input type="text" id="out_pertemuan" class="print-input font-bold-input px-2" value="3 (Tiga) - CnC Final">
                     </td>
                 </tr>
             </table>
@@ -272,7 +273,7 @@
             </div>
 
             <div class="signature-section">
-                <div class="mb-4 text-left">Gunungkidul, <span id="out_label_tgl" class="font-bold">7 Juni 2026</span></div>
+                <div class="mb-4 text-left">Gunungkidul, <span id="out_label_tgl" class="font-bold">17 Juni 2026</span></div>
                 
                 <table class="table-ttd">
                     <tr>
@@ -291,8 +292,8 @@
                             <div class="wrapper-render-ttd">
                                 <img id="img_render_karyawan" class="hidden" src="" alt="TTD Karyawan">
                             </div>
-                            <div id="out_ttd_nama" class="garis-nama-ttd">HERU PRATAMA</div>
-                            <div class="text-center text-[9.5pt] mt-0.5">NIK: <span id="out_ttd_nik">10049109</span></div>
+                            <div id="out_ttd_nama" class="garis-nama-ttd">KHARISMA NANDA IRVANSYAH</div>
+                            <div class="text-center text-[9.5pt] mt-0.5">NIK: <span id="out_ttd_nik">10085125</span></div>
                         </td>
                     </tr>
                 </table>
@@ -347,7 +348,7 @@
             const ctx = canvas.getContext('2d');
             const imgRender = document.getElementById(imgRenderId);
             
-            ctx.strokeStyle = '#0033aa';
+            ctx.strokeStyle = '#0033aa'; // Tinta Biru Resmi
             ctx.lineWidth = 4.2; 
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
@@ -467,11 +468,23 @@
                     alert("Link berkas tidak valid!");
                 }
             } else {
-                document.getElementById('box_evaluasi').value = "- Melakukan pelanggaran berupa penyetoran uang COD tidak pada hari yang sama. Sesuai ketentuan, seluruh uang COD wajib disetorkan maksimal pukul 23.59 pada setiap harinya, namun dilakukan penyetoran pada hari berikutnya.";
-                document.getElementById('box_penyebab').value = "- Keterlambatan penyetoran terjadi karena kurangnya kedisiplinan dan ketelitian dalam mematuhi prosedur operasional terkait batas waktu setor COD yang telah ditetapkan perusahaan.";
-                document.getElementById('box_commitment').value = "# Yang bersangkutan menyatakan memahami kesalahan yang telah dilakukan dan berkomitmen untuk:\nBerkomitmen untuk melakukan penyetoran uang COD tepat waktu setiap hari sebelum batas maksimal pukul 23.59, mematuhi seluruh SOP yang berlaku, serta tidak mengulangi pelanggaran yang sama di kemudian hari.";
+                // FALLBACK DATA KONSELING RESMI (KHARISMA NANDA IRVANSYAH)
+                document.getElementById('out_nama').value = "KHARISMA NANDA IRVANSYAH";
+                document.getElementById('out_nik').value = "10085125";
+                document.getElementById('out_jabatan').value = "MITRA SATRIA / BLHR0";
+                document.getElementById('out_tanggal').value = "17 Juni 2026";
+                document.getElementById('out_pertemuan').value = "3 (Tiga) - CnC Final";
+
+                document.getElementById('box_evaluasi').value = "- Karyawan tidak hadir bekerja sesuai jadwal yang telah ditentukan pada tanggal 17 Juni 2026 tanpa memberikan informasi maupun konfirmasi kepada atasan terlebih dahulu.\n- Pelanggaran tersebut merupakan pengulangan dari komitmen yang telah disampaikan pada counseling sebelumnya terkait kewajiban memberikan informasi apabila tidak dapat masuk layanan/kerja, sehingga mengganggu kelancaran operasional dan koordinasi pekerjaan.";
+                document.getElementById('box_penyebab').value = "- Berdasarkan hasil evaluasi dan klarifikasi yang dilakukan, pelanggaran terjadi karena kurangnya kedisiplinan kerja, rendahnya kepatuhan terhadap komitmen yang telah dibuat pada counseling sebelumnya, serta kurangnya tanggung jawab dalam menjalankan kewajiban komunikasi kepada atasan terkait ketidakhadiran kerja.";
+                document.getElementById('box_commitment').value = "• Mematuhi seluruh peraturan dan ketentuan perusahaan yang berlaku.\n• Hadir bekerja sesuai jadwal yang telah ditentukan.\n• Memberikan informasi kepada atasan secara langsung apabila berhalangan hadir bekerja atau mengalami kendala dalam menjalankan tugas.\n• Menjaga komunikasi dan koordinasi yang baik dengan atasan maupun rekan kerja.\n• Menjalankan pekerjaan sesuai SOP dan tanggung jawab yang diberikan.\n• Tidak mengulangi pelanggaran yang sama maupun pelanggaran disiplin kerja lainnya.\n\n*Catatan Tambahan:\nKaryawan telah menerima pembinaan melalui Counseling & Commitment sebanyak 3 kali (CNC Final). Dengan ini, karyawan diberikan kesempatan terakhir untuk memperbaiki sikap dan kedisiplinan. Apabila dalam kurun waktu 1 (satu) bulan sejak diterbitkannya form ini karyawan kembali melakukan pelanggaran disiplin serupa, maka akan direkomendasikan untuk proses pemutusan hubungan kemitraan.";
             }
             
+            // Sinkronisasi data awal ke bagian komponen bawah (Garis TTD)
+            document.getElementById('out_ttd_nama').innerText = document.getElementById('out_nama').value.toUpperCase();
+            document.getElementById('out_ttd_nik').innerText = document.getElementById('out_nik').value;
+            document.getElementById('out_label_tgl').innerText = document.getElementById('out_tanggal').value;
+
             ['box_evaluasi', 'box_penyebab', 'box_commitment'].forEach(id => {
                 const tx = document.getElementById(id);
                 const suffix = id.replace('box_', 'div_');
@@ -484,30 +497,40 @@
             const textareas = document.querySelectorAll('.content-box textarea');
             const divs = document.querySelectorAll('.print-div-view');
             
+            // Sembunyikan textarea input, aktifkan div text murni agar teks memanjang ke bawah dengan rapi
             textareas.forEach(t => t.style.display = 'none');
             divs.forEach(d => d.style.display = 'block');
 
             const element = document.getElementById('pdf-content');
             const kName = document.getElementById('out_nama').value.replace(/\s+/g, '_');
             
-            // HITUNG TINGGI ELEMEN ASLI UNTUK DINAMISASI HALAMAN
+            // Hitung tinggi asli elemen kontainer dalam piksel
             const elementHeightPx = element.offsetHeight;
             const elementWidthPx = element.offsetWidth;
             
-            // Konversi proporsional ukuran lebar A4 (210mm) ke tinggi kustom milimeter
+            // Konversi skala lebar standar A4 ke milimeter (210mm)
             const pdfWidthMm = 210;
+            // Dapatkan rasio tinggi proporsionalnya
             const pdfHeightMm = (elementHeightPx / elementWidthPx) * pdfWidthMm;
 
             const options = {
-                margin: [8, 12, 8, 12], 
+                margin: [5, 10, 5, 10], // Memperkecil margin agar teks naik ke atas dan efisien
                 filename: `Form_CnC_Signed_${kName}.pdf`,
                 image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { scale: 2.3, useCORS: true, letterRendering: true, logging: false },
-                // MENGGUNAKAN TINGGI HILIR YANG DINAMIS AGAR SELALU 1 HALAMAN UTUH
-                jsPDF: { unit: 'mm', format: [pdfWidthMm, pdfHeightMm + 20], orientation: 'portrait' }
+                html2canvas: { 
+                    scale: 2.5, 
+                    useCORS: true, 
+                    letterRendering: true, 
+                    logging: false,
+                    scrollY: 0,
+                    scrollX: 0
+                },
+                // MEMBERIKAN COMPENSATED HEIGHT (+35mm) AGAR TANDA TANGAN DI BAGIAN BAWAH PERMANEN AMAN
+                jsPDF: { unit: 'mm', format: [pdfWidthMm, pdfHeightMm + 35], orientation: 'portrait' }
             };
 
             html2pdf().set(options).from(element).save().then(() => {
+                // Kembalikan ke tampilan UI aplikasi web normal setelah PDF di-render
                 textareas.forEach(t => t.style.display = 'block');
                 divs.forEach(d => d.style.display = 'none');
                 autoExpandTextareas();
